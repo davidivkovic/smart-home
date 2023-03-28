@@ -1,0 +1,9 @@
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  src: url('/src/static/fonts/Inter-Regular.ttf') format('ttf');
+}
+
+* {
+  font-family: Inter, system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
