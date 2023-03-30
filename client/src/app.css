@@ -4,10 +4,11 @@
 
 @layer base {
   html {
-    overflow-y: overlay;
+    @apply bg-neutral-100;
+    /* overflow-y: overlay; */
   }
   h1 {
-    @apply text-4xl font-bold;
+    @apply text-3xl font-bold;
   }
   h2 {
     @apply text-2xl font-semibold;
@@ -15,9 +16,17 @@
   h3 {
     @apply text-lg font-semibold;
   }
- 
+
+  p {
+    @apply text-neutral-600;
+  }
+
+  small {
+    @apply text-xs text-neutral-400 block;
+  }
+
   button {
-    @apply rounded-lg px-6 py-3 text-[15px] font-medium transition duration-300 focus-visible:outline-none;
+    @apply bg-neutral-50 px-6 py-3 text-[15px] font-medium transition duration-300 focus-visible:outline-none;
   }
 
   button.primary {
@@ -25,7 +34,7 @@
   }
 
   button.secondary {
-    @apply border border-zinc-300 text-[15px] text-black hover:bg-zinc-50 disabled:bg-zinc-200 disabled:text-zinc-500;
+    @apply border border-black text-[15px] text-black hover:bg-neutral-100 disabled:bg-neutral-200 disabled:text-neutral-500;
   }
 
   [type='text'],
@@ -43,7 +52,7 @@
   [multiple],
   textarea,
   select {
-    @apply h-11 w-full rounded-lg border border-zinc-300 px-4 text-[15px] outline-none transition placeholder:text-gray-500 focus:border-black focus:bg-gray-50 focus:ring-2 focus:ring-black;
+    @apply h-12 w-full border border-neutral-300 bg-neutral-100 px-4 text-[15px] outline-none transition placeholder:text-sm placeholder:text-gray-500 focus:border-black focus:bg-gray-50 focus:ring-1 focus:ring-black;
   }
 
   label {

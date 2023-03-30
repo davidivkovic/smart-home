@@ -1,16 +1,9 @@
 <script>
-  import { onMount } from 'svelte'
-
   import XIcon from '~icons/tabler/x'
   export let title
   export let text
   export let close
 
-  onMount(() => {
-    setTimeout(() => {
-      close()
-    }, 3000)
-  })
 </script>
 
 <div class="w-full rounded-lg border border-zinc-300 p-6">

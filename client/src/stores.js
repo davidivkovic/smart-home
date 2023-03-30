@@ -1,12 +1,10 @@
-import { writable } from 'svelte/store'
+import { writable, get } from 'svelte/store'
 
 export const dialogs = writable([])
 export const notifications = writable([])
 
 export const openDialog = (dialogComponent, props, onClose = () => {}) => {
-  let currentCount
-  const unsubscribe = dialogs.subscribe((d) => (currentCount = d.length))
-  const id = currentCount + 1
+  const id = get(dialogs).length + 1
   const dialog = {
     id,
     props,
@@ -17,7 +15,6 @@ export const openDialog = (dialogComponent, props, onClose = () => {}) => {
     }
   }
   dialogs.update((d) => [...d, dialog])
-  unsubscribe()
 }
 
 export const closeDialog = (id) => {
@@ -25,10 +22,7 @@ export const closeDialog = (id) => {
 }
 
 export const openNotification = (text, title = '') => {
-  let currentCount
-  const unsubscribe = notifications.subscribe((n) => (currentCount = n.length))
-  unsubscribe()
-  const id = currentCount + 1
+  const id = get(notifications).length + 1
   notifications.update((n) => [
     ...n,
     {
