@@ -1,7 +1,9 @@
 @font-face {
-  font-family: Inter;
-  font-style: normal;
-  src: url('/src/static/fonts/Inter-Regular.ttf') format('ttf');
+  font-family: 'Inter';
+  src: url('/fonts/Inter.var.woff2') format('woff2');
+  font-weight: 1 999;
+  font-style: oblique 0deg 10deg;
+  font-display: swap;
 }
 
 * {

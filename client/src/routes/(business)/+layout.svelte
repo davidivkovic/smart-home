@@ -6,7 +6,7 @@
 </script>
 
 <main class="flex min-h-screen flex-col">
-  <Header />
+  <!-- <Header /> -->
   <Container>
     <NotificationOutlet />
     <DialogOutlet />

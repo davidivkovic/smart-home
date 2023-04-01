@@ -52,7 +52,7 @@
   [multiple],
   textarea,
   select {
-    @apply h-12 w-full border border-neutral-300 bg-neutral-100 px-4 text-[15px] outline-none transition placeholder:text-sm placeholder:text-gray-500 focus:border-black focus:bg-gray-50 focus:ring-1 focus:ring-black;
+    @apply h-11 w-full border border-neutral-300 bg-neutral-100 px-4 text-sm outline-none transition placeholder:text-[13px] placeholder:text-gray-500 focus:border-black focus:bg-gray-50 focus:ring-1 focus:ring-black;
   }
 
   label {

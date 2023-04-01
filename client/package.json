@@ -28,8 +28,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@peculiar/x509": "^1.9.3",
     "@tabler/icons-svelte": "^2.11.0",
     "bootstrap-icons": "^1.10.3",
-    "dayjs": "^1.11.7"
+    "dayjs": "^1.11.7",
+    "flag-icons": "^6.6.6",
+    "i18n-iso-countries": "^7.5.0"
   }
 }
