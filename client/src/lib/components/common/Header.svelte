@@ -1,7 +1,10 @@
 <script>
-  import Container from "./Container.svelte"
-
+  import Container from './Container.svelte'
+  import userStore from '$lib/stores/userStore'
 </script>
-<div class="sticky flex h-20 w-full justify-center bg-black">
-  <Container/>
+
+<div class="sticky h-20 w-full justify-center">
+  <Container>
+    <button class="secondary" on:click={userStore.logout}>Log out</button>
+  </Container>
 </div>

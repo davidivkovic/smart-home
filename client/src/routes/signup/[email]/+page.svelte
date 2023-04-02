@@ -1,9 +1,14 @@
 <script>
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
+  import { resendConfirmation, confirmEmail } from '$lib/api/auth'
   const email = $page.params.email
 
   const inputCount = 6
   const codeInputs = Array.from(Array(inputCount).keys())
+
+  let resendStatus = ''
+  let error = ''
 
   let inputContainer
 
@@ -41,17 +46,32 @@
   }
 
   const resendCode = () => {
-    console.log('resend', email)
+    try {
+      resendConfirmation(email)
+      resendStatus = 'New confirmation code send'
+      error = ''
+      // openNotification('Confirmation code resent')
+    } catch (err) {
+      resendStatus = err
+    }
   }
 
-  const confirmEmail = () => {
-    const code = Array.from(inputContainer.children).map((input) => input.value).join('')
-    console.log('confirm', code, email)
+  const confirm = async () => {
+    const token = Array.from(inputContainer.children)
+      .map((input) => input.value)
+      .join('')
+    try {
+      await confirmEmail({ email, token })
+      goto('/login')
+    } catch (err) {
+      resendStatus = ''
+      error = err
+    }
   }
 </script>
 
 <form
-  on:submit|preventDefault={confirmEmail}
+  on:submit|preventDefault={confirm}
   class="flex max-w-[460px] flex-col justify-between border bg-white py-10 px-9"
 >
   <h1>Confirm your email</h1>
@@ -73,9 +93,11 @@
   <button class="primary mt-5">Confirm email</button>
   <p class="mt-6 text-center text-sm">
     Did't get a code? <button
+      type="button"
       class="bg-transparent p-0 font-normal text-black underline"
-      on:click={resendCode}
-      href="/signin">Resend code</button
+      on:click={resendCode}>Resend code</button
     >
   </p>
+  <p class="mt-3 text-center text-sm text-neutral-600">{resendStatus}</p>
+  <p class="text-center text-sm text-red-600">{error}</p>
 </form>

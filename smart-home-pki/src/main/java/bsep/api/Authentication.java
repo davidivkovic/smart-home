@@ -107,7 +107,7 @@ public class Authentication extends Resource {
         var otp = user.generateOTP();
         ConfirmEmail.send(user.email, user.firstName, otp.code);
 
-        return ok();
+        return ok(otp);
     }
 
 }

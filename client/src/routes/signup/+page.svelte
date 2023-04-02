@@ -1,20 +1,25 @@
 <script>
   import { goto } from '$app/navigation'
+  import { signup } from '$lib/api/auth'
 
   let signupForm
-  const error = ''
+  let error = ''
 
-  const signup = () => {
+  const signupUser = async () => {
     const formData = new FormData(signupForm)
     const data = Object.fromEntries(formData)
-    // send to backend
-    goto(`/signup/${data.email}`)
+    try {
+      await signup(data)
+      goto(`/signup/${data.email}`)
+    } catch (err) {
+      error = err
+    }
   }
 </script>
 
 <form
   bind:this={signupForm}
-  on:submit|preventDefault={signup}
+  on:submit|preventDefault={signupUser}
   class="flex max-w-[444px] flex-col justify-between border bg-white py-10 px-10"
 >
   <div>
@@ -65,7 +70,7 @@
   <div class="mt-4">
     <button class="primary w-full"> Sign up</button>
     <p class="mt-6 text-center text-sm">
-      Already have an account? <a href="/signin" class="text-black underline">Sign in</a>
+      Already have an account? <a href="/login" class="text-black underline">Log in</a>
     </p>
     <small class="mt-6">
       By proceeding, you consent to get calls, WhatsApp or SMS messages, including by automated
