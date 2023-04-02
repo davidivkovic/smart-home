@@ -1,5 +1,5 @@
 <script>
-  import { dialogs } from '@/appStore'
+  import { dialogs } from '@/lib/stores/appStore'
   import Dialog from './Dialog.svelte'
 </script>
 

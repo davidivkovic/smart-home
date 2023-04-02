@@ -70,7 +70,7 @@
       />
     {/each}
   </div>
-  <button class="primary mt-5">Confirm email <div class="float-right">hi</div></button>
+  <button class="primary mt-5">Confirm email</button>
   <p class="mt-6 text-center text-sm">
     Did't get a code? <button
       class="bg-transparent p-0 font-normal text-black underline"

@@ -1,6 +1,6 @@
 <script>
   import ConfirmDialog from '$lib/components/test/ConfirmDialog.svelte'
-  import { openNotification, openDialog } from '@/appStore'
+  import { openNotification, openDialog } from '$lib/stores/appStore'
 
   const open = () => {
     openNotification('Uh oh! Something went wrong!', 'Sorry, there was a problem with your request')
