@@ -1,7 +1,9 @@
 <script>
-  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { resendConfirmation, confirmEmail } from '$lib/api/auth'
+  import { openDialog } from '$lib/stores/appStore'
+  import ContinueDialog from '$lib/components/signup/ContinueDialog.svelte'
+
   const email = $page.params.email
 
   const inputCount = 6
@@ -45,14 +47,13 @@
     }
   }
 
-  const resendCode = () => {
+  const resendCode = async () => {
     try {
-      resendConfirmation(email)
+      await resendConfirmation(email)
       resendStatus = 'New confirmation code send'
       error = ''
-      // openNotification('Confirmation code resent')
     } catch (err) {
-      resendStatus = err
+      error = err
     }
   }
 
@@ -62,7 +63,7 @@
       .join('')
     try {
       await confirmEmail({ email, token })
-      goto('/login')
+      openDialog(ContinueDialog)
     } catch (err) {
       resendStatus = ''
       error = err
@@ -92,7 +93,7 @@
   </div>
   <button class="primary mt-5">Confirm email</button>
   <p class="mt-6 text-center text-sm">
-    Did't get a code? <button
+    Didn't get a code? <button
       type="button"
       class="bg-transparent p-0 font-normal text-black underline"
       on:click={resendCode}>Resend code</button

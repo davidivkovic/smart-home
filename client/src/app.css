@@ -18,11 +18,11 @@
   }
 
   p {
-    @apply text-neutral-600 text-[15px];
+    @apply text-[15px] text-neutral-600;
   }
 
   small {
-    @apply text-xs text-neutral-400 block;
+    @apply block text-xs text-neutral-400;
   }
 
   button {
@@ -34,7 +34,7 @@
   }
 
   button.secondary {
-    @apply border border-black text-[15px] text-black hover:bg-neutral-100 disabled:bg-neutral-200 disabled:text-neutral-500;
+    @apply border border-black bg-white text-[15px] text-black hover:bg-neutral-100 disabled:bg-neutral-200 disabled:text-neutral-500;
   }
 
   [type='text'],

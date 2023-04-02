@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.Date;
 
 @RegisterForReflection
 public class CSR extends PanacheMongoEntity {
@@ -30,8 +31,8 @@ public class CSR extends PanacheMongoEntity {
     public String pemCSR;
     public String pemCertificate;
     public String userId;
-    public LocalDate requestedAt;
-    public LocalDate processedAt;
+    public Date requestedAt;
+    public Date processedAt;
     public Status status;
     public String rejectionReason;
     public byte[] publicKey;
@@ -91,7 +92,7 @@ public class CSR extends PanacheMongoEntity {
         var csr = new CSR();
 
         csr.userId = user.id.toHexString();
-        csr.requestedAt = LocalDate.now();
+        csr.requestedAt = new Date();
         csr.status = Status.Pending;
         csr.pemCSR = pemCsr;
 
@@ -132,12 +133,12 @@ public class CSR extends PanacheMongoEntity {
 
     public void approve() {
         this.status = Status.Approved;
-        this.processedAt = LocalDate.now();
+        this.processedAt = new Date();
     }
 
     public void reject(String reason) {
         this.status = Status.Rejected;
-        this.processedAt = LocalDate.now();
+        this.processedAt = new Date();
         this.rejectionReason = reason;
     }
 

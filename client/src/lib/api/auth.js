@@ -1,7 +1,7 @@
 import { baseUrl, fetch } from '.'
 import userStore from '$lib/stores/userStore'
 
-const authUrl = `${baseUrl}/auth`
+const authUrl = baseUrl + '/auth'
 
 const login = async (email, password) => {
   const result = await fetch(`${authUrl}/login`, {
@@ -13,18 +13,18 @@ const login = async (email, password) => {
   userStore.login(json.user, json.token)
 }
 
-const signup = async ({ email, password, firstName, lastName }) =>
+const signup = ({ email, password, firstName, lastName }) =>
   fetch(`${authUrl}/register`, {
     method: 'POST',
     body: JSON.stringify({ email, password, firstName, lastName })
   })
 
-const resendConfirmation = async (email) =>
+const resendConfirmation = (email) =>
   fetch(`${authUrl}/resend-confirmation?${new URLSearchParams({ email }).toString()}`, {
     method: 'POST'
   })
 
-const confirmEmail = async ({ email, token }) =>
+const confirmEmail = ({ email, token }) =>
   fetch(`${authUrl}/confirm?${new URLSearchParams({ email, token }).toString()}`, {
     method: 'POST'
   })

@@ -28,8 +28,6 @@ const getToken = () => {
 }
 
 export default {
-  user,
-  isAuthenticated,
   login,
   logout,
   getToken

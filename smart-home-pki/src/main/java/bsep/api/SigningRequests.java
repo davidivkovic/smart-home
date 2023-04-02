@@ -5,6 +5,7 @@ import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
 
 import bsep.users.User;
+import io.quarkus.security.Authenticated;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bson.types.ObjectId;
@@ -23,7 +24,7 @@ import javax.ws.rs.core.Response;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-@Path("csr")
+@Path("csrs")
 public class SigningRequests extends Resource {
 
     @Inject
@@ -31,7 +32,9 @@ public class SigningRequests extends Resource {
 
     @POST
     @Path("/")
+    @Authenticated
     @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response submit(@NotBlank String pemCsr) {
 
         User user = User.findById(new ObjectId(userId()));
