@@ -1,5 +1,5 @@
 <script>
-  import { openDialog } from '@/stores'
+  import { openDialog } from '@/appStore'
   import AnotherDialog from './AnotherDialog.svelte'
 
   export let someProp

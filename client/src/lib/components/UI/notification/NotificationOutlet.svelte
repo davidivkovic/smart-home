@@ -1,5 +1,5 @@
 <script>
-  import { notifications } from '@/stores'
+  import { notifications } from '@/appStore'
   import Notification from './Notification.svelte'
 </script>
 

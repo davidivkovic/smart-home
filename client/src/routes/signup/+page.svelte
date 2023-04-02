@@ -1,32 +1,64 @@
 <script>
+  import { goto } from '$app/navigation'
+
+  let signupForm
   const error = ''
+
   const signup = () => {
-    console.log('signup')
+    const formData = new FormData(signupForm)
+    const data = Object.fromEntries(formData)
+    // send to backend
+    goto(`/signup/${data.email}`)
   }
 </script>
 
 <form
+  bind:this={signupForm}
   on:submit|preventDefault={signup}
   class="flex max-w-[444px] flex-col justify-between border bg-white py-10 px-10"
 >
   <div>
     <h1>Create an account</h1>
-    <p class="mt-1 text-[15px]">Enter your credentials and sign in to your account</p>
+    <p class="mt-1">Enter your information to get started</p>
     <div class="mt-5 flex flex-col gap-2">
       <label for="email">First name</label>
-      <input required type="text" placeholder="Your first name" autocomplete="given-name" />
+      <input
+        required
+        type="text"
+        name="firstName"
+        placeholder="Enter your first name"
+        autocomplete="given-name"
+      />
     </div>
     <div class="mt-5 flex flex-col gap-2">
       <label for="email">Last name</label>
-      <input required type="text" placeholder="Your last name" autocomplete="family-name" />
+      <input
+        required
+        type="text"
+        name="lastName"
+        placeholder="Enter your last name"
+        autocomplete="family-name"
+      />
     </div>
     <div class="mt-5 flex flex-col gap-2">
       <label for="email">Email</label>
-      <input required type="text" placeholder="Your email" autocomplete="email" />
+      <input
+        required
+        type="text"
+        name="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+      />
     </div>
     <div class="mt-4 flex flex-col gap-2">
       <label for="password">Password</label>
-      <input required type="password" placeholder="Your password" autocomplete="current-password" />
+      <input
+        required
+        type="password"
+        name="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      />
     </div>
   </div>
   <p class="mt-4 text-center text-sm text-red-600">{error}</p>
