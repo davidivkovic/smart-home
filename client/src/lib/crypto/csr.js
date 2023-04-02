@@ -1,10 +1,10 @@
-import { Pkcs10CertificateRequestGenerator } from '@peculiar/x509'
+import { Pkcs10CertificateRequestGenerator, Pkcs10CertificateRequest } from '@peculiar/x509'
 
 const signingAlgorithm = 'RSASSA-PKCS1-v1_5'
 const hashAlgorithm = 'SHA-256'
 
 export const RDN = {
-  commonName: 'CN', 
+  commonName: 'CN',
   country: 'C',
   state: 'ST',
   locality: 'L',
@@ -26,25 +26,38 @@ export const createCSR = async RDNs => {
       hash: hashAlgorithm
     },
     true,
-    ['sign', 'verify', 'encrypt', 'decrypt']
+    ['sign', 'verify']
   )
 
   const csr = await Pkcs10CertificateRequestGenerator.create({
-    name: Object.entries().map((rdn, value) => ({ [rdn]: [{ utf8String: value }] })),
+    name: Object.entries(RDNs).map(([rdn, value]) => ({ [rdn]: [{ utf8String: value }] })),
     keys,
     signingAlgorithm
   })
 
-  const csrBuffer = await Pkcs10CertificateRequestGenerator.export(csr)
-
   return {
-    publicKey: await crypto.subtle.exportKey('spki', keys.publicKey),
-    privateKey: await crypto.subtle.exportKey('pkcs8', keys.privateKey),
-    csr: toPEM(csrBuffer, 'CERTIFICATE REQUEST')
+    publicKey: keyToPEM(await crypto.subtle.exportKey('spki', keys.publicKey), 'PUBLIC KEY'),
+    privateKey: keyToPEM(await crypto.subtle.exportKey('pkcs8', keys.privateKey), 'PRIVATE KEY'),
+    csr: toPEM(csr, 'CERTIFICATE REQUEST')
   }
 }
 
-const toPEM = (buffer, type) => {
-  const base64 = buffer.toString("base64").replace(/(.{64})/g, '$1\n')
+function keyToPEM(buffer, type) {
+  const base64 = window.btoa(String.fromCharCode.apply(null, new Uint8Array(buffer))).replace(/(.{64})/g, '$1\n')
   return `-----BEGIN ${type}-----\n${base64}\n-----END ${type}-----`
+}
+
+const toPEM = (data, type) => {
+  const base64 = data.toString("base64").replace(/(.{64})/g, '$1\n')
+  return `-----BEGIN ${type}-----\n${base64}\n-----END ${type}-----`
+}
+
+/**
+ * 
+ * @param {string} pem 
+ * @returns {RDN}
+ */
+export const CSRFromPEM = pem => {
+  const csr = new Pkcs10CertificateRequest(pem)
+  return Object.entries(RDN).reduce((acc, [rdn, value]) => ({ [rdn]: csr.subjectName.getField(value)[0], ...acc }), {})
 }

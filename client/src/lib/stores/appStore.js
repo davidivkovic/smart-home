@@ -9,6 +9,7 @@ export const openDialog = (dialogComponent, props, onClose = () => {}) => {
     id,
     props,
     content: dialogComponent,
+    hasCloseButton: props.hasCloseButton ?? true,
     close: () => {
       onClose()
       closeDialog(id)

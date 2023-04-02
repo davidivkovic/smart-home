@@ -34,7 +34,10 @@ public class SigningRequests extends Resource {
     @Consumes(MediaType.TEXT_PLAIN)
     public Response submit(@NotBlank String pemCsr) {
 
-        var csr = CSR.fromPem(pemCsr, userId());
+        User user = User.findById(new ObjectId(userId()));
+        if (user == null) return badRequest("Could not find the user associated with this request.");
+
+        var csr = CSR.fromPem(pemCsr, user);
         if (csr == null) return badRequest("Could not parse the PEM formatted certificate signing request.");
 
         var validation = validator.validate(csr);

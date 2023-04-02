@@ -4,7 +4,7 @@
 </script>
 
 {#each $dialogs as dialog}
-  <Dialog close={dialog.close}>
+  <Dialog close={dialog.close} hasCloseButton={dialog.hasCloseButton}>
     <svelte:component this={dialog.content} {...dialog.props} close={dialog.close} />
   </Dialog>
 {/each}
