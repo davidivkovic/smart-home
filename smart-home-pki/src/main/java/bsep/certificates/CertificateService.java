@@ -3,6 +3,10 @@ package bsep.certificates;
 import static bsep.util.Utils.Environment;
 import static bsep.util.Utils.RootDir;
 
+import bsep.users.User;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -17,6 +21,7 @@ import java.util.*;
 import java.io.*;
 import java.security.*;
 import java.math.BigInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.security.cert.X509Certificate;
 import java.security.cert.Certificate;
@@ -57,25 +62,54 @@ public class CertificateService {
         catch (Exception e) { throw new RuntimeException("Error occurred while loading keystore " + keystorePath); }
     }
 
+    public KeyStore getStore() {
+        return this.store;
+    }
+
     public X509Certificate getCertificate(String alias) {
         try { return (X509Certificate) this.store.getCertificate(alias); }
         catch (Exception e) { return null; }
     }
 
-    public List<X509Certificate> getCertificates(long page, int pageSize, String alias) {
-        var filterByAlias = alias.length() > 0;
+    public Map<String, String> getCertificates(
+        long page,
+        int pageSize,
+        String aliasFilter,
+        String userId,
+        boolean isAdmin
+    ) {
+        var filterByAlias = aliasFilter.length() > 0;
+        var aliasedCertificates = new HashMap<String, String>();
+        var skip = page * pageSize;
+        Enumeration<String> aliases;
+
         try {
-            return Collections
-                    .list(this.store.aliases())
-                    .stream()
-                    .filter(a -> !filterByAlias || a.contains(alias))
-                    .map(this::getCertificate)
-                    .filter(Objects::nonNull)
-                    .skip(page * pageSize)
-                    .limit(pageSize)
-                    .toList();
+            aliases = this.store.aliases();
         }
-        catch (Exception e) { return Collections.emptyList(); }
+        catch (Exception e) { return aliasedCertificates; }
+
+        while (aliases.hasMoreElements() && aliasedCertificates.size() < pageSize) {
+            var alias = aliases.nextElement();
+            if (filterByAlias && !alias.contains(aliasFilter)) continue;
+
+            if (skip > 0) {
+                skip--;
+                continue;
+            }
+
+            var certificate = this.getCertificate(alias);
+            if (certificate == null) continue;
+
+            var subjectId = CSR.getRDN(new X500Name(certificate.getSubjectX500Principal().getName()), BCStyle.UID);
+            if (!isAdmin && !subjectId.equals(userId)) continue;
+
+            var pem = toPem(certificate);
+            if (pem == null) continue;
+
+            aliasedCertificates.put(alias, pem);
+        }
+
+        return aliasedCertificates;
     }
 
     public Certificate[] getCertificateChain(String alias) {
@@ -119,6 +153,7 @@ public class CertificateService {
     }
 
     public static X509Certificate createCertificate(
+            User requester,
             PKCS10CertificationRequest csr,
             KeyUsage keyUsage,
             ExtendedKeyUsage extendedKeyUsage,
@@ -142,7 +177,15 @@ public class CertificateService {
                     .setProvider("BC")
                     .build(issuerPrivateKey);
 
-            var subject = csr.getSubject();
+            var subjectBuilder = new X500NameBuilder(BCStyle.INSTANCE);
+            for (var rdn : csr.getSubject().getRDNs())
+                subjectBuilder.addRDN(rdn.getFirst());
+
+            subjectBuilder.addRDN(BCStyle.UID, requester.id.toHexString());
+            subjectBuilder.addRDN(BCStyle.GIVENNAME, requester.firstName);
+            subjectBuilder.addRDN(BCStyle.SURNAME, requester.lastName);
+
+            var subject = subjectBuilder.build();
             var publicKey = new JcaPEMKeyConverter().getPublicKey(csr.getSubjectPublicKeyInfo());
             var serialNumber = new BigInteger(158, random);
 
@@ -157,7 +200,7 @@ public class CertificateService {
 
             certificateBuilder.addExtension(Extension.keyUsage, true, keyUsage);
             certificateBuilder.addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage);
-            certificateBuilder.addExtension(Extension.issuingDistributionPoint, false, CRL.distributionPoint);
+            certificateBuilder.addExtension(Extension.cRLDistributionPoints, false, CRL.distributionPoint);
 
             var certificateHolder = certificateBuilder.build(contentSigner);
             var certificateConverter = new JcaX509CertificateConverter().setProvider("BC");
@@ -200,7 +243,7 @@ public class CertificateService {
         try (var pw = new JcaPEMWriter(sw)) { pw.writeObject(BCObject); }
         catch (IOException e) { return null; }
 
-        return sw.toString();
+        return sw.toString().replaceAll("\\r", "");
     }
 
     public static String toPem(Certificate[] certificates) {
@@ -211,7 +254,7 @@ public class CertificateService {
         }
         catch (IOException e) { return null; }
 
-        return sw.toString();
+        return sw.toString().replaceAll("\\r", "");
     }
 
 }

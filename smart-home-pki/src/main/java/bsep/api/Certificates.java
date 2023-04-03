@@ -4,19 +4,27 @@ import bsep.certificates.CRL;
 import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
 
+import io.quarkus.security.Authenticated;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Set;
+import java.security.cert.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Path("/certs")
@@ -24,20 +32,16 @@ public class Certificates extends Resource {
 
     @GET
     @Path("/")
+    @Authenticated
     public Response getAll(
         @QueryParam("page") @NotNull @Min(1) int page,
-        @QueryParam("storeType") @NotBlank @Pattern(regexp = "^(keystore|trusted)$") String storeType,
+        @QueryParam("storeType") @NotBlank @Pattern(regexp = "^(keystore|truststore)$") String storeType,
         @QueryParam("alias") @Size(max = 128) String alias
     ) {
-        alias = alias != null && alias.trim().isEmpty() ? alias : "";
+        alias = alias != null && !alias.trim().isEmpty() ? alias : "";
 
-        var store= storeType.equals("trusted") ? CertificateService.trustedStore : CertificateService.keyStore;
-        var certificates = store
-                .getCertificates(page - 1, 4, alias)
-                .stream()
-                .map(CertificateService::toPem)
-                .filter(Objects::nonNull)
-                .toList();
+        var store= storeType.equals("truststore") ? CertificateService.trustedStore : CertificateService.keyStore;
+        var certificates = store.getCertificates(page - 1, 4, alias, userId(), isAdmin());
 
         return ok(certificates);
     }
@@ -64,8 +68,8 @@ public class Certificates extends Resource {
         return ok(aliasedCertificates);
     }
 
-    // TODO: Check if the user is authorized to see the certificate
     @GET
+    @Authenticated
     @Path("/{alias}")
     public Response get(@PathParam("alias") @Size(max = 128) String alias) {
 
@@ -84,35 +88,60 @@ public class Certificates extends Resource {
         return ok(pem, MediaType.TEXT_PLAIN);
     }
 
-    @GET
+    @POST
     @Path("/check-validity")
-    public Response checkValidity(
-        @QueryParam("aliases") @NotNull @Size(min = 1, max = 4)
-        Set<@NotBlank @Pattern(regexp = "^[0-9a-z.\\-]*$") @Size(max = 128) String> aliases
-    ) {
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkValidity(@NotBlank @Size(max = 32000) String pemChain) {
         var crl = CRL.getLatest();
         if (crl == null) return badRequest("Could not find the latest CRL. Please try again later.");
 
-        var certificates = aliases.stream()
-            .map(CertificateService.keyStore::getCertificate)
-            .filter(Objects::nonNull)
-            .toList();
+        var certificates = new ArrayList<X509Certificate>();
+        try {
+            X509CertificateHolder certHolder;
+            var pemParser = new PEMParser(new StringReader(pemChain));
 
-        var unauthorized = certificates.stream().anyMatch(c -> {
-            var subject = new X500Name(c.getSubjectX500Principal().getName());
-            var subjectId = CSR.getRDN(subject, BCStyle.UID);
-            return !isAdmin() && !subjectId.equals(userId());
-        });
-
-        if (unauthorized || certificates.size() != aliases.size()) return badRequest();
-
-        var validity = aliases.stream().collect(Collectors.toMap(
-            alias -> alias,
-            alias -> {
-                var certificate = CertificateService.keyStore.getCertificate(alias);
-                return CertificateService.isValid(certificate) && !crl.isRevoked(certificate.getSerialNumber());
+            while ((certHolder = (X509CertificateHolder) pemParser.readObject()) != null) {
+                var certConverter = new JcaX509CertificateConverter();
+                certificates.add(certConverter.getCertificate(certHolder));
             }
-        ));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return badRequest("Could not parse the PEM chain.");
+        }
+        try {
+            var certificateFactory = CertificateFactory.getInstance("X.509");
+            var chain = certificateFactory.generateCertPath(certificates);
+
+            var params = new PKIXParameters(CertificateService.trustedStore.getStore());
+            params.setRevocationEnabled(false);
+            var validator = CertPathValidator.getInstance("PKIX", "BC");
+            validator.validate(chain, params);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return badRequest("The certificate chain is broken.");
+        }
+
+        boolean chainBroken = false;
+        var validity = new HashMap<String, Boolean>();
+        Collections.reverse(certificates);
+
+        for (var certificate : certificates) {
+            var hex = certificate.getSerialNumber().toString(16);
+            var serialNumber = hex.length() % 2 == 0 ? hex : "0" + hex;
+
+            if (chainBroken) {
+                validity.put(serialNumber, false);
+                continue;
+            }
+
+            var isRevoked = crl.isRevoked(certificate.getSerialNumber());
+            if (isRevoked) chainBroken = true;
+
+            validity.put(serialNumber, !isRevoked);
+        }
 
         return ok(validity);
     }
@@ -124,11 +153,11 @@ public class Certificates extends Resource {
     @Path("/{serial-number}/revoke")
     @Produces(MediaType.TEXT_PLAIN)
     public Response revoke(
-        @PathParam("serial-number") @NotBlank @Size(max = 128) @Pattern(regexp = "^[0-9]+$") String serialNumber,
+        @PathParam("serial-number") @NotBlank @Size(max = 128) @Pattern(regexp = "^[0-9a-zA-Z]+$") String serialNumber,
         @QueryParam("reason") @NotNull @Min(0) @Max(10) int reason
     ) {
         boolean success;
-        synchronized (CRL.class) { success = CRL.revokeCertificate(new BigInteger(serialNumber), reason); }
+        synchronized (CRL.class) { success = CRL.revokeCertificate(new BigInteger(serialNumber, 16), reason); }
         return success ? ok() : badRequest("Could not revoke the certificate. Please try again later.");
     }
 

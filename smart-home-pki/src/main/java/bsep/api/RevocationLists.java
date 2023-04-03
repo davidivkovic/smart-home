@@ -17,10 +17,6 @@ public class RevocationLists extends Resource {
     @Path("/latest.crl")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getNewest() {
-        if (!CRL.exists()) {
-            var success = CRL.create();
-            if (!success) return badRequest("Could not create the CRL. Please try again later.");
-        }
 
         var crl = CRL.getLatest();
         if (crl == null || crl.asX509() == null) {

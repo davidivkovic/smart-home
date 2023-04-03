@@ -3,15 +3,15 @@ import { writable, get } from 'svelte/store'
 export const dialogs = writable([])
 export const notifications = writable([])
 
-export const openDialog = (dialogComponent, props, onClose = () => {}) => {
+export const openDialog = (dialogComponent, props = {}, onClose = (value = '') => {}) => {
   const id = get(dialogs).length + 1
   const dialog = {
     id,
     props,
     content: dialogComponent,
     hasCloseButton: props.hasCloseButton ?? true,
-    close: () => {
-      onClose()
+    close: (value) => {
+      onClose(value)
       closeDialog(id)
     }
   }

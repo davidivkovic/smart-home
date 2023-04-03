@@ -27,7 +27,24 @@ import java.util.Set;
 @MongoEntity
 public class CRL extends PanacheMongoEntityBase {
 
-    public static final IssuingDistributionPoint distributionPoint = new IssuingDistributionPoint(
+    public static final CRLDistPoint distributionPoint = new CRLDistPoint(
+        new DistributionPoint[] {
+            new DistributionPoint(
+                new DistributionPointName(
+                    new GeneralNames(
+                        new GeneralName(
+                            GeneralName.uniformResourceIdentifier,
+                            "http://localhost:8080/crls/latest.crl"
+                        )
+                    )
+                ),
+                null,
+                null
+            )
+        }
+    );
+
+    public static final IssuingDistributionPoint issuingDistributionPoint = new IssuingDistributionPoint(
         new DistributionPointName(
             new GeneralNames(
                 new GeneralName(
@@ -65,8 +82,12 @@ public class CRL extends PanacheMongoEntityBase {
         return this.x509CRL.getRevokedCertificate(serialNumber) != null;
     }
 
-    public static CRL getLatest() {
+    public static CRL getLatestNoCreate() {
         return findAll(Sort.descending("_id")).firstResult();
+    }
+    public static CRL getLatest() {
+        if (!CRL.exists()) CRL.create();
+        return CRL.getLatestNoCreate();
     }
 
     public static boolean exists() {
@@ -78,7 +99,7 @@ public class CRL extends PanacheMongoEntityBase {
     }
 
     public static boolean revokeCertificate(BigInteger serialNumber, int reason) {
-        var latestCRL = CRL.getLatest();
+        var latestCRL = CRL.getLatestNoCreate();
         if (latestCRL != null && latestCRL.isRevoked(serialNumber)) return false;
 
         var nextCrlId = latestCRL == null ? 1 : latestCRL.id + 1;
@@ -96,7 +117,7 @@ public class CRL extends PanacheMongoEntityBase {
 
             crlBuilder.addExtension(Extension.cRLNumber, true, new ASN1Integer(nextCrlId));
             crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, keyIdentifier);
-            crlBuilder.addExtension(Extension.issuingDistributionPoint, false, CRL.distributionPoint);
+            crlBuilder.addExtension(Extension.issuingDistributionPoint, false, CRL.issuingDistributionPoint);
             crlBuilder.setNextUpdate(nextUpdate);
 
             if (latestCRL != null) {

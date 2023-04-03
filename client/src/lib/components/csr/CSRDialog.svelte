@@ -5,6 +5,11 @@
   import CheckIcon from '~icons/tabler/circle-check-filled'
   import DiscountCheckIcon from '~icons/tabler/discount-check'
   import { RDN, createCSR } from '$lib/crypto/csr'
+  import { submitCSR } from '$lib/api/csrs'
+  import { openDialog } from '$lib/stores/appStore'
+  import CSRResultDialog from './CSRResultDialog.svelte'
+  import CSRDetailsDialog from './CSRDetailsDialog.svelte'
+  export let close
 
   registerLocale(en)
 
@@ -83,11 +88,22 @@
       {}
     )
     const csr = await createCSR(rdnValues)
-    console.log(csr)
+    try {
+      const csrResult = await submitCSR(csr.PEM)
+      close()
+      openDialog(
+        CSRResultDialog, 
+        { csr: csrResult, privateKey: csr.privateKey, hasCloseButton: false }, 
+        () => {}
+      )
+    }
+    catch (e) {
+      console.error(e)
+    }
   }
 </script>
 
-<main class="mx-auto pl-4 pr-6 pt-1.5 pb-3">
+<main class="mx-auto pl-3 pr-6 pt-1.5 pb-3">
   <div class="flex">
     <!-- <div class="basis-6"></div> -->
     <div class="ml-2 w-[440px]">

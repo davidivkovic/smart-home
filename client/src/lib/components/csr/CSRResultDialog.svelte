@@ -1,20 +1,36 @@
 <script>
   import AlertTriangleIcon from '~icons/tabler/alert-triangle'
   import DownloadIcon from '~icons/tabler/download'
+  import { openDialog } from '$lib/stores/appStore'
+  import CSRDetailsDialog from './CSRDetailsDialog.svelte'
   export let close
+  export let csr
+  export let privateKey
 
   let keyDownloaded = false
 
-  const file = new Blob(['hello'], { type: 'text/plain' })
-  const dlHref = URL.createObjectURL(file)
-  const dlName = 'private-key.pem'
+  const createDownload = (content, name, fileType) => { 
+    const file = new Blob([content], { type: 'text/plain' })
+    const href = URL.createObjectURL(file)
+    const fileName = `${name}.${fileType}`
+
+    return { href, fileName }
+  }
+
+  const privateKeyDownload = createDownload(privateKey, csr.commonName, 'key')
+  const csrDownload = createDownload(csr.pemCSR, csr.commonName, 'csr')
 
   const downloadKey = () => {
     keyDownloaded = true
   }
+
+  const showDetails = () => {
+    close()
+    openDialog(CSRDetailsDialog, { csr }, close)
+  }
 </script>
 
-<main class="max-w-[500px]">
+<main class="max-w-[516px] pt-1">
   <div class="border border-[#825c0f]/30 bg-amber-50 p-5 pt-4 text-[#825c0f]">
     <div class="flex items-center gap-x-2">
       <AlertTriangleIcon />
@@ -29,8 +45,8 @@
   <div class="mt-5 flex gap-x-3">
     <a
       on:click={downloadKey}
-      href={dlHref}
-      download={dlName}
+      href={privateKeyDownload.href}
+      download={privateKeyDownload.fileName}
       class="group relative flex-1 border border-neutral-300 bg-white p-4 text-left font-normal transition duration-300 hover:border-black"
     >
       <h6 class="text-sm font-medium">Private Key (Required)</h6>
@@ -47,9 +63,8 @@
       </div>
     </a>
     <a
-      on:click={downloadKey}
-      href={dlHref}
-      download={dlName}
+      href={csrDownload.href}
+      download={csrDownload.fileName}
       class="group relative flex-1 border border-neutral-300 bg-white p-4 text-left font-normal transition duration-300 hover:border-black"
     >
       <h6 class="text-sm font-medium">Certificate Signing Request</h6>
@@ -67,10 +82,10 @@
     </a>
   </div>
   <button
-    on:click={close}
+    on:click={showDetails}
     class="primary mt-5 w-full text-center !text-sm"
     disabled={!keyDownloaded}
   >
-    Close
+    Continue
   </button>
 </main>
