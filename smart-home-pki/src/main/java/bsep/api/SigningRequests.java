@@ -5,6 +5,7 @@ import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
 
 import bsep.users.User;
+import io.quarkus.panache.common.Sort;
 import io.quarkus.security.Authenticated;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -35,7 +36,7 @@ public class SigningRequests extends Resource {
     @Authenticated
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response submit(@NotBlank String pemCsr) {
+    public Response submit(@NotBlank @Size(max = 32000) String pemCsr) {
 
         User user = User.findById(new ObjectId(userId()));
         if (user == null) return badRequest("Could not find the user associated with this request.");
@@ -55,7 +56,7 @@ public class SigningRequests extends Resource {
     @Path("/")
     // TODO: A user can only see their own signing requests, and an admin can see all of them
     public Response getAll(@QueryParam("page") @NotNull @Min(1) int page) {
-        return ok(CSR.findAll().page(page - 1, 4).list());
+        return ok(CSR.findAll(Sort.by("requestedAt").descending()).page(page - 1, 4).list());
     }
 
     @GET
@@ -84,7 +85,7 @@ public class SigningRequests extends Resource {
         var csrPKCS = csr.asPKCS();
         if (csrPKCS == null) return badRequest("Could not parse the certificate signing request.");
 
-        User requester = User.findById(new ObjectId(CSR.getRDN(csrPKCS.getSubject(), BCStyle.UID)));
+        User requester = User.findById(new ObjectId(csr.userId));
         if (requester == null) {
             return badRequest("Could not find the user associated with the certificate signing request.");
         }
@@ -97,6 +98,7 @@ public class SigningRequests extends Resource {
         if (issuer == null) return badRequest("Could not find the issuer certificate.");
 
         var certificate = CertificateService.createCertificate(
+                requester,
                 csrPKCS,
                 request.extractKeyUsage(),
                 request.extractExtendedKeyUsage(),
@@ -129,7 +131,7 @@ public class SigningRequests extends Resource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response reject(
         @PathParam("id") @NotBlank @Size(max = 100) String id,
-        @QueryParam("reason") @NotBlank @Size(max = 1024) String reason
+        @QueryParam("reason") @Size(max = 1024) String reason
     ) {
         CSR csr = CSR.findById(new ObjectId(id));
 

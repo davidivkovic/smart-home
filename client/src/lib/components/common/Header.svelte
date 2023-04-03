@@ -1,10 +1,30 @@
 <script>
   import Container from './Container.svelte'
-  import userStore from '$lib/stores/userStore'
+  import userStore, { user } from '$lib/stores/userStore'
+  import { page } from '$app/stores'
 </script>
 
-<div class="sticky h-20 w-full justify-center">
+<div class="sticky h-16 w-full justify-center">
   <Container>
-    <button class="secondary" on:click={userStore.logout}>Log out</button>
+    <div class="flex">
+      <a
+        href="/certificates"
+        class="text-sm font-medium underline-offset-2"
+        class:underline={$page.url.pathname === '/certificates'}
+      >
+        Certificates
+      </a>
+      <a
+        href="/csrs"
+        class="ml-4 text-sm font-medium underline-offset-2"
+        class:underline={$page.url.pathname === '/csrs'}
+      >
+        Signing Requests
+      </a>
+      <span class="ml-auto mr-1.5 text-sm">({$user.firstName} {$user.lastName})</span>
+      <button type="button" class="p-0 text-sm font-medium" on:click={userStore.logout}>
+        Log out
+      </button>
+    </div>
   </Container>
 </div>

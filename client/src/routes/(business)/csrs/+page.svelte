@@ -1,59 +1,89 @@
 <script>
   import { onMount } from 'svelte'
 
-  import { getCsrs } from '$lib/api/csrs'
-
   import { openDialog } from '$lib/stores/appStore'
-  import CsrDialog from '$lib/components/csr/CSRDialog.svelte'
   import CsrResultDialog from '$lib/components/csr/CSRResultDialog.svelte'
   import CsrPreview from '$lib/components/csr/CSRPreview.svelte'
+  import { goto } from '$app/navigation'
+  import { page } from '$app/stores'
+
+  export let data
 
   // openDialog(CsrDialog, { hasCloseButton: false })
   // openDialog(CsrResultDialog, { hasCloseButton: false })
 
-  //   const testCSR = CSRFromPEM(
-  // `-----BEGIN CERTIFICATE REQUEST-----
-  // MIIB1TCCAT4CAQAwgZQxIjAgBgkqhkiG9w0BCQEME2dvcmFqa29yYUBnbWFpbC5j
-  // b20xCzAJBgNVBAYMAkdCMQ8wDQYDVQQIDAZMb25kb24xDzANBgNVBAcMBkxvbmRv
-  // bjEUMBIGA1UECwwLRW5naW5lZXJpbmcxETAPBgNVBAoMCEZhY2Vib29rMRYwFAYD
-  // VQQDDA1EYXZpZCBJdmtvdmljMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW
-  // BEeoy92vIC6QAgYjky1DyHQ4ElweWsOb45yBYbJJyeldA4iftyZgVq86y6DbA/1V
-  // tiaZZiQnCVS43St5dvWYf4D8Cytp1Yth/eSBtWpFCkPdJSV++3dAKKQXNfLhkB91
-  // 2bLl2Ia3Q1Ntk2IUqXsp3SsHtdKySH8fh2PE+wLtVwIDAQABoAAwDQYJKoZIhvcN
-  // AQELBQADgYEATEMVVI1jGyEGpYsjrWQtWjcFCkPwi6xOj3tuQ7/zApMnN8Eacjcz
-  // 2Crm4cNIVLLcv4XBo0WN/uoHEOnEjxdILmBNWPjFqxYc5gbJXAlb0j0wz0fYgf8M
-  // WgrcY17UiYFc8tIJjqlZrAcA7e4CZAHBFCyFB28KyknzZ252P+rslGI=
-  // -----END CERTIFICATE REQUEST-----`
-  //   )
-
   let currentPage = 1
   let end = false
-
+  let loading = false
   let csrs = []
 
-  onMount(async () => {
-    document.addEventListener('scroll', onScroll)
-    csrs = await getCsrs(1)
-  })
+  // onMount(async () => {
+  //   // document.addEventListener('scroll', onScroll)
+  //   // csrs = await getCsrs(1)
+  // })
+
+  // const nextPage = async () => {
+  //   if (loading) return
+  //   loading = true
+  //   currentPage += 1
+  //   const newData = await getCsrs(currentPage)
+  //   if (newData.length === 0) {
+  //     document.removeEventListener('scroll', onScroll)
+  //     end = true
+  //   } else {
+  //     csrs = [...csrs, ...newData]
+  //   }
+  //   loading = false
+  // }
+
+  $: currentPage = Number($page.url.searchParams.get('page') ?? 1)
+  $: {
+    if (data.csrs.length < 4) end = true
+    csrs = [...csrs, ...data.csrs]
+  }
 
   const onScroll = async (event) => {
-    const { scrollTop, clientHeight, scrollHeight } = event.target.scrollingElement
-    if (scrollTop + clientHeight >= scrollHeight) {
-      currentPage += 1
-      const newData = await getCsrs(currentPage)
-      if (newData.length === 0) {
-        document.removeEventListener('scroll', onScroll)
-        end = true
-      } else {
-        csrs = [...csrs, newData]
-      }
-    }
+    // const { scrollTop, clientHeight, scrollHeight } = event.target.scrollingElement
+    // if (scrollTop + clientHeight >= scrollHeight) {
+    //   await nextPage()
+    // }
+    if (!end) goto(`/csrs?page=${currentPage + 1}`, { noScroll: true })
+  }
+
+  const preloadCsrDialog = async () => {
+    await import('$lib/components/csr/CSRDialog.svelte')
+  }
+
+  const openCsrDialog = async (csr) => {
+    const CsrDialog = await import('$lib/components/csr/CSRDialog.svelte').then(($) => $.default)
+    openDialog(CsrDialog)
   }
 </script>
 
-<h1>Certificate signing requests</h1>
-<div class="mt-6 flex flex-col gap-5">
+<div class="flex">
+  <div>
+    <h1 class="text-xl">Certificate Signing Requests</h1>
+    <p class="text-sm">Click on a CSR below to see details</p>
+  </div>
+  <button
+    on:mouseenter={preloadCsrDialog}
+    on:click={openCsrDialog}
+    class="secondary ml-auto !text-sm h-11 py-1 px-10 !border-neutral-300 mt-1"
+  >
+    Create CSR
+  </button>
+</div>
+<div class="mt-6 flex flex-col gap-4">
   {#each csrs as csr}
     <CsrPreview {csr} />
   {/each}
+</div>
+<div class="mt-2 text-sm font-normal text-neutral-600">
+  {#if end}
+    <p class="py-3 text-center">No more CSRs to show</p>
+  {:else}
+    <button on:click={onScroll} class="mx-auto flex bg-transparent text-sm font-normal">
+      Load More
+    </button>
+  {/if}
 </div>

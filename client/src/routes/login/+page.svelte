@@ -10,7 +10,7 @@
   const loginUser = async () => {
     try {
       await login(email, password)
-      goto('/')
+      goto('/csrs')
     } catch (err) {
       error = err
     }

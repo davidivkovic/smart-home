@@ -38,7 +38,7 @@ export const createCSR = async RDNs => {
   return {
     publicKey: keyToPEM(await crypto.subtle.exportKey('spki', keys.publicKey), 'PUBLIC KEY'),
     privateKey: keyToPEM(await crypto.subtle.exportKey('pkcs8', keys.privateKey), 'PRIVATE KEY'),
-    csr: toPEM(csr, 'CERTIFICATE REQUEST')
+    PEM: toPEM(csr, 'CERTIFICATE REQUEST')
   }
 }
 

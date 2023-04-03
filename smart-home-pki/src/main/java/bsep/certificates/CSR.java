@@ -1,6 +1,7 @@
 package bsep.certificates;
 
 import bsep.users.User;
+
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -16,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.Date;
 
 @RegisterForReflection
@@ -91,7 +91,6 @@ public class CSR extends PanacheMongoEntity {
     public static CSR fromPem(String pemCsr, User user) {
         var csr = new CSR();
 
-        csr.userId = user.id.toHexString();
         csr.requestedAt = new Date();
         csr.status = Status.Pending;
         csr.pemCSR = pemCsr;
@@ -112,15 +111,13 @@ public class CSR extends PanacheMongoEntity {
         var subject = request.getSubject();
 
         csr.commonName         = getRDN(subject, BCStyle.CN).trim();
-//        csr.givenName          = getRDN(subject, BCStyle.GIVENNAME).trim();
-//        csr.surname            = getRDN(subject, BCStyle.SURNAME).trim();
         csr.email              = getRDN(subject, BCStyle.E).trim();
         csr.organization       = getRDN(subject, BCStyle.O).trim();
         csr.organizationUnit   = getRDN(subject, BCStyle.OU).trim();
         csr.locality           = getRDN(subject, BCStyle.L).trim();
         csr.state              = getRDN(subject, BCStyle.ST).trim();
         csr.country            = getRDN(subject, BCStyle.C).trim();
-
+        csr.userId             = user.id.toHexString();
         csr.givenName          = user.firstName;
         csr.surname            = user.lastName;
 
