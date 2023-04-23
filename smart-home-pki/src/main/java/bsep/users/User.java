@@ -102,6 +102,15 @@ public class User extends PanacheMongoEntity {
         return true;
     }
 
+    public static List<User> search(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return listAll();
+        }
+        return find("firstName like ?1 or lastName like ?1 or email like ?1",
+            "/" + query + "/i")
+            .list();
+    }
+
     public boolean isAdmin() {
         return this.role.equals(Roles.ADMIN);
     }
