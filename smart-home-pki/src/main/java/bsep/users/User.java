@@ -46,6 +46,7 @@ public class User extends PanacheMongoEntity {
 
     public String firstName;
     public String lastName;
+    public String fullName;
     public String email;
     public String role;
     public boolean emailConfirmed;
@@ -61,6 +62,7 @@ public class User extends PanacheMongoEntity {
 
         user.firstName = firstName;
         user.lastName = lastName;
+        user.fullName = firstName + " " + lastName;
         user.email = email;
         user.role = role;
 
@@ -119,10 +121,7 @@ public class User extends PanacheMongoEntity {
         if (query == null || query.trim().isEmpty()) {
             return findAll().page(page, pageSize).list();
         }
-        // TODO: Fix SQL injection
-        return find("{ $or: [ { firstName: { $regex: ?1, $options: 'i' } }, " +
-                "{ lastName: { $regex: ?1, $options: 'i' } }, " +
-                "{ email: { $regex: ?1, $options: 'i' } } ] }", query)
+        return find("fullName like ?1", "/" + query + "/i")
                 .page(page, pageSize)
                 .list();
     }

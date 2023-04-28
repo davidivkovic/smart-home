@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -23,7 +24,7 @@ public class Users extends Resource {
     @Path("/")
     @RolesAllowed({ Roles.ADMIN })
     public Response getAllUsers(
-            @QueryParam("query") @Size(max = 128) String query,
+            @QueryParam("query") @Size(max = 128) @Pattern(regexp = "[a-zA-Z\\s]*") String query,
             @QueryParam("page") @NotNull int page)
     {
         var users = User.search(query, page - 1, 4);
