@@ -19,7 +19,9 @@ public class User extends PanacheMongoEntity {
     public static class Roles {
 
         public static final String ADMIN = "admin";
-        public static final String USER = "user";
+        public static final String LANDLORD = "landlord";
+        public static final String TENANT = "tenant";
+        public static final List<String> all = List.of(ADMIN, LANDLORD, TENANT);
     }
 
     /**
@@ -118,9 +120,11 @@ public class User extends PanacheMongoEntity {
             return findAll().page(page, pageSize).list();
         }
         // TODO: Fix SQL injection
-        return find("firstName like ?1 or lastName like ?1 or email like ?1)", "/" + query + "/i")
-            .page(page, pageSize)
-            .list();
+        return find("{ $or: [ { firstName: { $regex: ?1, $options: 'i' } }, " +
+                "{ lastName: { $regex: ?1, $options: 'i' } }, " +
+                "{ email: { $regex: ?1, $options: 'i' } } ] }", query)
+                .page(page, pageSize)
+                .list();
     }
 
     public boolean isAdmin() {
