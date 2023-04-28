@@ -12,4 +12,9 @@ const changeRole = (id, role) =>
     method: 'PUT'
   })
 
-export { getAll, deleteOne, changeRole }
+const getAllRoles = async () => {
+  const response = await fetch(`${usersUrl}/roles`)
+  return await response.json()
+}
+
+export { getAll, deleteOne, changeRole, getAllRoles }

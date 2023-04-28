@@ -1,16 +1,5 @@
 package bsep.api;
 
-import bsep.api.dto.authentication.AuthenticationRequest;
-import bsep.api.dto.authentication.AuthenticationResponse;
-import bsep.api.dto.authentication.RegistrationRequest;
-import bsep.api.dto.users.UserDTO;
-import bsep.email.ConfirmEmail;
-import bsep.users.User;
-
-import static bsep.util.Utils.mapper;
-
-import io.quarkus.security.Authenticated;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,6 +9,17 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+
+import io.quarkus.security.Authenticated;
+
+import bsep.api.dto.authentication.AuthenticationRequest;
+import bsep.api.dto.authentication.AuthenticationResponse;
+import bsep.api.dto.authentication.RegistrationRequest;
+import bsep.api.dto.users.UserDTO;
+import bsep.email.ConfirmEmail;
+import bsep.users.User;
+
+import static bsep.util.Utils.mapper;
 
 @Path("auth")
 @Produces(MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ public class Authentication extends Resource {
         var user = User.findByEmail(request.email);
         if (user != null) return badRequest("A user with this email already exists.");
 
-        user = User.register(request.firstName, request.lastName, User.Roles.USER, request.email, request.password);
+        user = User.register(request.firstName, request.lastName, User.Roles.TENANT, request.email, request.password);
         var otp = user.generateOTP();
 
         ConfirmEmail.send(user.email, user.firstName, otp.code);

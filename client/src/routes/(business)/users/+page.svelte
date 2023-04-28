@@ -1,15 +1,18 @@
 <script>
   import { goto, invalidate, invalidateAll } from '$app/navigation'
   import { page } from '$app/stores'
-  import { changeRole, deleteOne } from '$lib/api/users.js'
+  import { changeRole, deleteOne, getAllRoles } from '$lib/api/users.js'
   import TrashIcon from '~icons/tabler/trash'
 
   export let data
   let users = []
+
   let end = false
   let search = false
   let query = ''
   let timer
+
+  let promise = getAllRoles()
 
   $: currentPage = Number($page.url.searchParams.get('page') ?? 1)
 
@@ -18,7 +21,7 @@
   const updateUsers = (newUsers) => {
     if (search) users = [...newUsers]
     else users = [...users, ...newUsers]
-    
+
     end = newUsers.length < 4
   }
 
@@ -36,29 +39,47 @@
     query = queryString
 
     timer = setTimeout(async () => {
-      await goto(
-        '/users?' + new URLSearchParams({ query }).toString(), 
-        { noScroll: true, replaceState: true, keepFocus: true }
-      )
+      const searchParams = createQuerySearchParam()
+      await goto('/users?' + searchParams.toString(), {
+        noScroll: true,
+        replaceState: true,
+        keepFocus: true
+      })
     }, 250)
   }
 
   const onScroll = (e) => {
     search = false
-    goto(`/users?query=${e.target.value}&page=${currentPage + 1}`, { noScroll: true })
+    const searchParams = createQuerySearchParam()
+    searchParams.append('page', currentPage + 1)
+    goto('/users?' + searchParams.toString(), { noScroll: true })
+  }
+
+  const createQuerySearchParam = () => {
+    const searchParams = new URLSearchParams()
+    if (query.length > 0) {
+      searchParams.append('query', query)
+    }
+    return searchParams
   }
 
   const deleteUser = async (id) => {
-    await deleteOne(id)
-    users = users.filter(u => u.id != id)
+    try {
+      await deleteOne(id)
+      users = users.filter((u) => u.id != id)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
-  const updateUser = async (id, role) => {
-    await changeRole(id, role)
-    // TODO: Fix 
-    invalidateAll()
+  const updateUser = async (id, event) => {
+    try {
+      await changeRole(id, event.target.value)
+      users.find(user => user.id === id).role = event.target.value
+    } catch (e) {
+      console.log(e)
+    }
   }
-
 </script>
 
 <div class="mb-6 flex items-center justify-between">
@@ -87,22 +108,16 @@
           {user.email}
         </p>
       </div>
-      <div class="flex items-center gap-4">
-        <div class="text-sm">
-          <button
-            on:click={() => updateUser(user.id, 'admin')}
-            class={`bg-transparent p-0 ${
-              user.role === 'admin' ? 'font-semibold' : 'cursor-pointer font-normal'
-            }`}>admin</button
-          >
-          /
-          <button
-            on:click={() => updateUser(user.id, 'user')}
-            class={`bg-transparent p-0 ${
-              user.role === 'user' ? 'font-semibold' : 'cursor-pointer font-normal'
-            }`}>user</button
-          >
-        </div>
+      <div class="flex items-center gap-2">
+        {#await promise}
+          <p>Loading roles...</p>
+        {:then roles}
+          <select on:change={(event) => updateUser(user.id, event)} class="w-28">
+            {#each roles as role}
+              <option value={role} selected={role === user.role}>{role}</option>
+            {/each}
+          </select>
+        {/await}
         <button
           class="cursor-pointer bg-transparent text-[13px]"
           on:click={() => deleteUser(user.id)}
