@@ -9,16 +9,8 @@ import bsep.users.User;
 
 import static bsep.util.Utils.mapper;
 
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.MailTemplate;
-import io.quarkus.mailer.Mailer;
-import io.quarkus.qute.Location;
 import io.quarkus.security.Authenticated;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
-
-import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,7 +20,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.time.Duration;
 
 @Path("auth")
 @Produces(MediaType.APPLICATION_JSON)

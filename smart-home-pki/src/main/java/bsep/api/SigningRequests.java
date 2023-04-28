@@ -1,17 +1,16 @@
 package bsep.api;
 
-import bsep.api.dto.pki.ApproveSigningRequest;
+import bsep.users.User;
 import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
+import bsep.api.dto.pki.ApproveSigningRequest;
 
-import bsep.users.User;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.security.Authenticated;
+
 import org.apache.commons.lang3.time.DateUtils;
-import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bson.types.ObjectId;
 
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.Validator;
