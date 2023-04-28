@@ -1,12 +1,12 @@
 package bsep.api;
 
 import bsep.users.User;
-import io.quarkus.hibernate.validator.runtime.jaxrs.ResteasyViolationExceptionImpl;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
-import javax.inject.Inject;
+import io.quarkus.hibernate.validator.runtime.jaxrs.ResteasyViolationExceptionImpl;
+
 import javax.validation.ConstraintViolation;
 import javax.ws.rs.core.*;
+
 import java.util.List;
 import java.util.Set;
 

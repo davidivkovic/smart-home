@@ -5,27 +5,23 @@ import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
 
 import io.quarkus.security.Authenticated;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.cert.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Path("/certs")
 public class Certificates extends Resource {
