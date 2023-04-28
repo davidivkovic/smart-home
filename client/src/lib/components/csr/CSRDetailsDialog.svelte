@@ -4,7 +4,7 @@
   import { getCA } from '$lib/api/certificates'
   import { rejectCSR } from '$lib/api/csrs'
   import { RDN } from '$lib/crypto/csr'
-  import dayjs from 'dayjs'
+  import dayjs from 'dayjs/esm'
 
 
   export let csr

@@ -7,7 +7,7 @@
   import { checkValidity, getByAlias } from '$lib/api/certificates'
   import { onMount } from 'svelte'
   import { RDN } from '$lib/crypto/csr'
-  import dayjs from 'dayjs'
+  import dayjs from 'dayjs/esm'
 
   export let data
 

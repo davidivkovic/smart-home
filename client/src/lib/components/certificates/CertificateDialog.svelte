@@ -2,7 +2,7 @@
   import { RDN } from '$lib/crypto/csr'
   import CertificateIcon from '~icons/tabler/certificate'
   import { KeyUsagesExtension, ExtendedKeyUsageExtension } from '@peculiar/x509'
-  import dayjs from 'dayjs'
+  import dayjs from 'dayjs/esm'
   import { openDialog } from '$lib/stores/appStore'
   import { checkValidity } from '$lib/api/certificates'
   import { user, isAdmin } from '$lib/stores/userStore'

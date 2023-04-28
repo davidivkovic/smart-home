@@ -1,9 +1,10 @@
 package bsep.certificates;
 
+import bsep.users.User;
+
 import static bsep.util.Utils.Environment;
 import static bsep.util.Utils.RootDir;
 
-import bsep.users.User;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -21,7 +22,6 @@ import java.util.*;
 import java.io.*;
 import java.security.*;
 import java.math.BigInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.security.cert.X509Certificate;
 import java.security.cert.Certificate;
@@ -32,17 +32,15 @@ public class CertificateService {
     private final char[] keystorePassword;
     private final KeyStore store;
 
-    public static final CertificateService keyStore;
-    public static final CertificateService trustedStore;
+    public static CertificateService keyStore;
+    public static CertificateService trustedStore;
 
-    static {
+    public static void init() {
         var password = Environment.getOrDefault("unified-password", "Eoo7kXdxtOxU85YI4/w=");
 
         keyStore = new CertificateService("keystore.p12", password);
         trustedStore = new CertificateService("truststore.p12", password);
     }
-
-    public static void init() { /* This method is called to initialize the static fields */ }
 
     private CertificateService(String keystoreName, String keystorePassword) {
         this.keystorePath = RootDir + "/pki/stores/" + keystoreName;
@@ -226,15 +224,6 @@ public class CertificateService {
         catch (Exception e) {
             return null;
         }
-    }
-
-    public static boolean isValid(X509Certificate certificate) {
-        if (certificate == null) return false;
-        try {
-            certificate.checkValidity();
-            return true;
-        }
-        catch (Exception e) { return false; }
     }
 
     public static String toPem(Object BCObject) {
