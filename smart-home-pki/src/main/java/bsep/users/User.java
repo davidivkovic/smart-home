@@ -8,7 +8,9 @@ import io.smallrye.jwt.build.Jwt;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.bson.types.ObjectId;
 
+import javax.management.relation.Role;
 import java.time.Duration;
 import java.util.*;
 
@@ -88,6 +90,15 @@ public class User extends PanacheMongoEntity {
         return this.otp;
     }
 
+    public void updateRole(String role) {
+        this.role = role;
+        this.update();
+    }
+
+    public static User findById(ObjectId id) {
+        return find("_id", id).firstResult();
+    }
+
     public static User findByEmail(String email) {
         return find("email", email).firstResult();
     }
@@ -102,12 +113,13 @@ public class User extends PanacheMongoEntity {
         return true;
     }
 
-    public static List<User> search(String query) {
+    public static List<User> search(String query, int page, int pageSize) {
         if (query == null || query.trim().isEmpty()) {
-            return listAll();
+            return findAll().page(page, pageSize).list();
         }
-        return find("firstName like ?1 or lastName like ?1 or email like ?1",
-            "/" + query + "/i")
+        // TODO: Fix SQL injection
+        return find("firstName like ?1 or lastName like ?1 or email like ?1)", "/" + query + "/i")
+            .page(page, pageSize)
             .list();
     }
 

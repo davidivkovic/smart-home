@@ -21,6 +21,13 @@
       >
         Signing Requests
       </a>
+      <a
+      href="/users"
+      class="ml-4 text-sm font-medium underline-offset-2"
+      class:underline={$page.url.pathname === '/users'}
+    >
+      Users
+    </a>
       <span class="ml-auto mr-1.5 text-sm">({$user.firstName} {$user.lastName})</span>
       <button type="button" class="p-0 text-sm font-medium" on:click={userStore.logout}>
         Log out

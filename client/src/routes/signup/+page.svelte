@@ -9,7 +9,7 @@
   let password = ''
 
   const passwordRequirements = [
-    { text: 'Be at least 8 characters long' },
+    { text: 'At least 8 characters long' },
     { text: 'Contain at least 1 number' },
     { text: 'Contain at least 1 lowercase letter' },
     { text: 'Contain at least 1 uppercase letter' },
