@@ -35,7 +35,8 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar bu
 
 You can create a native executable using: 
 ```shell script
-./gradlew build -Dquarkus.package.type=native
+# ./gradlew build -Dquarkus.package.type=native
+./gradlew build "-Dquarkus.package.type=native" "-Dquarkus.native.container-build=true" "-Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java19"  '-Dquarkus.native.additional-build-args="--trace-object-instantiation=java.util.Random, --initialize-at-run-time=org.apache.commons.lang3.RandomStringUtils, --report-unsupported-elements-at-runtime"'
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 

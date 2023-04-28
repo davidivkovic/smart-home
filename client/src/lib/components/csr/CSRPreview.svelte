@@ -1,5 +1,5 @@
 <script>
-  import dayjs from 'dayjs'
+  import dayjs from 'dayjs/esm'
   import ClockIcon from '~icons/tabler/clock-filled'
   import CheckIcon from '~icons/tabler/circle-check-filled'
   import XIcon from '~icons/tabler/circle-x-filled'

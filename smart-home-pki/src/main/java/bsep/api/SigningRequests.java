@@ -11,6 +11,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bson.types.ObjectId;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.Validator;
@@ -54,9 +55,12 @@ public class SigningRequests extends Resource {
 
     @GET
     @Path("/")
-    // TODO: A user can only see their own signing requests, and an admin can see all of them
+    @Authenticated
     public Response getAll(@QueryParam("page") @NotNull @Min(1) int page) {
-        return ok(CSR.findAll(Sort.by("requestedAt").descending()).page(page - 1, 4).list());
+        var CSRs = isAdmin()
+            ? CSR.findAll(Sort.by("requestedAt").descending()).page(page - 1, 4).list()
+            : CSR.find("userId", Sort.by("requestedAt").descending(), userId()).page(page - 1, 4).list();
+        return ok(CSRs);
     }
 
     @GET
