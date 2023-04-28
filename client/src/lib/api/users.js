@@ -2,8 +2,14 @@ import { baseUrl, fetch } from './'
 
 const usersUrl = `${baseUrl}/users`
 
-const getAll = (page, query = '') =>
-  fetch(usersUrl + '?' + new URLSearchParams({ page, query }).toString())
+const getAll = async (page, query = '') => {
+  try {
+    const response = await fetch(usersUrl + '?' + new URLSearchParams({ page, query }).toString())
+    return await response.json()
+  } catch (error) {
+    return []
+  }
+}
 
 const deleteOne = (id) => fetch(`${usersUrl}/${id}`, { method: 'DELETE' })
 

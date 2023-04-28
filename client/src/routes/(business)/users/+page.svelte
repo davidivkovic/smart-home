@@ -1,8 +1,10 @@
 <script>
-  import { goto, invalidate, invalidateAll } from '$app/navigation'
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { changeRole, deleteOne, getAllRoles } from '$lib/api/users.js'
   import TrashIcon from '~icons/tabler/trash'
+  import SearchIcon from '~icons/tabler/search'
+  import UserIcon from '~icons/tabler/user-shield'
 
   export let data
   let users = []
@@ -75,7 +77,7 @@
   const updateUser = async (id, event) => {
     try {
       await changeRole(id, event.target.value)
-      users.find(user => user.id === id).role = event.target.value
+      users.find((user) => user.id === id).role = event.target.value
     } catch (e) {
       console.log(e)
     }
@@ -87,12 +89,13 @@
     <h1 class="text-xl">Users</h1>
     <p class="text-sm">Click on a CSR below to see details</p>
   </div>
-  <div class="flex flex-col">
+  <div class="relative">
+    <SearchIcon class="absolute left-4 top-0 mt-1.5 translate-y-1/2 text-[13px] text-gray-500" />
     <input
       on:input={setQuery}
       autocomplete="off"
       type="search"
-      class="w-64 bg-white"
+      class=" bg-white pl-11"
       name="query"
       placeholder="Search users.."
     />
@@ -108,21 +111,31 @@
           {user.email}
         </p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center">
         {#await promise}
           <p>Loading roles...</p>
         {:then roles}
-          <select on:change={(event) => updateUser(user.id, event)} class="w-28">
-            {#each roles as role}
-              <option value={role} selected={role === user.role}>{role}</option>
-            {/each}
-          </select>
+        <div class="relative">
+          <div class="absolute h-full flex items-center">
+            <UserIcon class="text-[13px] ml-3 text-gray-700" />
+          </div>
+          <select
+          on:change={(event) => updateUser(user.id, event)}
+          class="h-10 pr-[58px] cursor-pointer text-[13px] pl-9"
+          >
+          {#each roles as role}
+              <option value={role} selected={role === user.role}>
+                {role[0].toUpperCase() + role.slice(1)}
+              </option>
+              {/each}
+            </select>
+          </div>
         {/await}
         <button
-          class="cursor-pointer bg-transparent text-[13px]"
+          class="h-10 px-8 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 py-0 text-[13px]"
           on:click={() => deleteUser(user.id)}
         >
-          <TrashIcon class="text-[14px]" />
+          <TrashIcon class="text-[13px] text-gray-700" />
         </button>
       </div>
     </div>

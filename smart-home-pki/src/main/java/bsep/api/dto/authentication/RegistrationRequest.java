@@ -2,6 +2,7 @@ package bsep.api.dto.authentication;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class RegistrationRequest {
@@ -11,9 +12,9 @@ public class RegistrationRequest {
     @NotBlank @Size(min = 6, max = 128)
     public String password;
 
-    @NotBlank @Size(max = 64)
+    @NotBlank @Size(max = 64) @Pattern(regexp = "[a-zA-Z\\s]*")
     public String firstName;
 
-    @NotBlank @Size(max = 64)
+    @NotBlank @Size(max = 64) @Pattern(regexp = "[a-zA-Z\\s]*")
     public String lastName;
 }
