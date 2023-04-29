@@ -2,15 +2,23 @@ package bsep.users;
 
 import bsep.crypto.PBKDF2;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.qrcode.QRCodeWriter;
 
+import com.j256.twofactorauth.TimeBasedOneTimePasswordUtil;
+
+import static com.j256.twofactorauth.TimeBasedOneTimePasswordUtil.DEFAULT_OTP_LENGTH;
+import static com.j256.twofactorauth.TimeBasedOneTimePasswordUtil.DEFAULT_QR_DIMENTION;
+
+import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.smallrye.jwt.build.Jwt;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.types.ObjectId;
 
-import javax.management.relation.Role;
+import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.util.*;
 
@@ -53,6 +61,8 @@ public class User extends PanacheMongoEntity {
     public String password;
     public String salt;
     public OTP otp;
+    public boolean MFAEnabled;
+    public String MFASecret;
 
     public static User register(String firstName, String lastName, String role, String email, String password) {
         User user = new User();
@@ -129,4 +139,48 @@ public class User extends PanacheMongoEntity {
     public boolean isAdmin() {
         return this.role.equals(Roles.ADMIN);
     }
+
+    public String generateMFASecret() {
+        this.MFASecret = TimeBasedOneTimePasswordUtil.generateBase32Secret();
+        return this.MFASecret;
+    }
+
+    public String generateMFAQRCode() {
+        var authenticatorURL = "otpauth://totp/" + "Smart%20Home:" + this.email
+            + "?secret=" + this.MFASecret
+            + "&issuer=smart-home"
+            + "&digits=" + DEFAULT_OTP_LENGTH
+            + "&period=" + 30;
+        var stream = new ByteArrayOutputStream();
+        try {
+            MatrixToImageWriter.writeToStream(
+                new QRCodeWriter().encode(
+                    authenticatorURL,
+                    BarcodeFormat.QR_CODE,
+                    DEFAULT_QR_DIMENTION,
+                    DEFAULT_QR_DIMENTION
+                ),
+                "png",
+                stream
+            );
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
+        }
+        catch (Exception e) { return null; }
+    }
+
+    public boolean finishMFASetup(int code) {
+        try {
+            this.MFAEnabled = TimeBasedOneTimePasswordUtil.validateCurrentNumber(
+                this.MFASecret, code, 5000
+            );
+            this.update();
+        }
+        catch (Exception e) { /* Ignore */ }
+        return this.MFAEnabled;
+    }
+
+    public boolean disableMFA(String recoveryCode) {
+        return false;
+    }
+
 }

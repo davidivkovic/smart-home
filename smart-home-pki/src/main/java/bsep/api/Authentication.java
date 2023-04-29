@@ -1,5 +1,19 @@
 package bsep.api;
 
+import bsep.users.User;
+import bsep.email.ConfirmEmail;
+import bsep.api.dto.users.UserDTO;
+import bsep.api.dto.authentication.AuthenticationRequest;
+import bsep.api.dto.authentication.AuthenticationResponse;
+import bsep.api.dto.authentication.Add2FAResponse;
+import bsep.api.dto.authentication.RegistrationRequest;
+
+import static bsep.util.Utils.mapper;
+
+import io.quarkus.security.Authenticated;
+
+import org.bson.types.ObjectId;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,17 +23,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-
-import io.quarkus.security.Authenticated;
-
-import bsep.api.dto.authentication.AuthenticationRequest;
-import bsep.api.dto.authentication.AuthenticationResponse;
-import bsep.api.dto.authentication.RegistrationRequest;
-import bsep.api.dto.users.UserDTO;
-import bsep.email.ConfirmEmail;
-import bsep.users.User;
-
-import static bsep.util.Utils.mapper;
 
 @Path("auth")
 @Produces(MediaType.APPLICATION_JSON)
@@ -99,6 +102,39 @@ public class Authentication extends Resource {
         ConfirmEmail.send(user.email, user.firstName, otp.code);
 
         return ok(otp);
+    }
+
+    @POST
+    @Authenticated
+    @Path("/2fa/add")
+    public Response add2FA() {
+        User user = User.findById(new ObjectId(userId()));
+        if (user == null) return badRequest("A user with this email does not exist.");
+
+        if (!user.MFAEnabled) user.generateMFASecret();
+        var qr = user.generateMFAQRCode();
+
+        if (qr == null) return badRequest("Could not enable 2FA. Please try again later.");
+
+        user.update();
+        var response = new Add2FAResponse(qr, user.MFASecret);
+
+        return ok(response);
+    }
+
+    @POST
+    @Authenticated
+    @Path("/2fa/confirm")
+    public Response confirm2FA(@QueryParam("ode") @NotNull int code) {
+        User user = User.findById(new ObjectId(userId()));
+        if (user == null) return badRequest("A user with this email does not exist.");
+
+        if (!user.MFAEnabled) return badRequest("2FA is not enabled for this user.");
+
+        var success = user.finishMFASetup(code);
+        if (!success) return badRequest("The code you entered is not valid or has already expired.");
+
+        return ok();
     }
 
 }
