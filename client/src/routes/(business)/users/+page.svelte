@@ -115,24 +115,24 @@
         {#await promise}
           <p>Loading roles...</p>
         {:then roles}
-        <div class="relative">
-          <div class="absolute h-full flex items-center">
-            <UserIcon class="text-[13px] ml-3 text-gray-700" />
-          </div>
-          <select
-          on:change={(event) => updateUser(user.id, event)}
-          class="h-10 pr-[58px] cursor-pointer text-[13px] pl-9"
-          >
-          {#each roles as role}
-              <option value={role} selected={role === user.role}>
-                {role[0].toUpperCase() + role.slice(1)}
-              </option>
+          <div class="relative">
+            <div class="absolute flex h-full items-center">
+              <UserIcon class="ml-3 text-[13px] text-gray-700" />
+            </div>
+            <select
+              on:change={(event) => updateUser(user.id, event)}
+              class="h-10 cursor-pointer pr-[58px] pl-9 text-[13px]"
+            >
+              {#each roles as role}
+                <option value={role} selected={role === user.role}>
+                  {role[0].toUpperCase() + role.slice(1)}
+                </option>
               {/each}
             </select>
           </div>
         {/await}
         <button
-          class="h-10 px-8 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 py-0 text-[13px]"
+          class="h-10 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 px-8 py-0 text-[13px]"
           on:click={() => deleteUser(user.id)}
         >
           <TrashIcon class="text-[13px] text-gray-700" />
