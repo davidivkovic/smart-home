@@ -9,6 +9,7 @@ public class RegistrationRequest {
     @NotBlank @Email @Size(max = 128)
     public String email;
 
+    // TODO: Password pattern validation
     @NotBlank @Size(min = 6, max = 128)
     public String password;
 
