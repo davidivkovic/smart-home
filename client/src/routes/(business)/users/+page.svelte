@@ -1,7 +1,9 @@
 <script>
-  import { goto } from '$app/navigation'
+  import { goto, invalidateAll } from '$app/navigation'
   import { page } from '$app/stores'
+  
   import { changeRole, deleteOne, getAllRoles } from '$lib/api/users.js'
+  import { firstPage, nextPage } from './store.js'
   import TrashIcon from '~icons/tabler/trash'
   import SearchIcon from '~icons/tabler/search'
   import UserIcon from '~icons/tabler/user-shield'
@@ -11,12 +13,10 @@
 
   let end = false
   let search = false
-  let query = ''
+  let query = $page.url.searchParams.get('query') ?? ''
   let timer
 
   let promise = getAllRoles()
-
-  $: currentPage = Number($page.url.searchParams.get('page') ?? 1)
 
   $: updateUsers(data.users)
 
@@ -42,6 +42,7 @@
 
     timer = setTimeout(async () => {
       const searchParams = createQuerySearchParam()
+      firstPage()
       await goto('/users?' + searchParams.toString(), {
         noScroll: true,
         replaceState: true,
@@ -52,9 +53,8 @@
 
   const onScroll = (e) => {
     search = false
-    const searchParams = createQuerySearchParam()
-    searchParams.append('page', currentPage + 1)
-    goto('/users?' + searchParams.toString(), { noScroll: true })
+    nextPage()
+    invalidateAll()
   }
 
   const createQuerySearchParam = () => {
@@ -95,9 +95,10 @@
       on:input={setQuery}
       autocomplete="off"
       type="search"
-      class=" bg-white pl-11"
+      class=" w-56 bg-white pl-11"
       name="query"
       placeholder="Search users.."
+      bind:value={query}
     />
   </div>
 </div>
@@ -121,7 +122,7 @@
             </div>
             <select
               on:change={(event) => updateUser(user.id, event)}
-              class="h-10 cursor-pointer pr-[58px] pl-9 text-[13px]"
+              class="h-10 cursor-pointer pr-[46px] pl-9 text-[13px]"
             >
               {#each roles as role}
                 <option value={role} selected={role === user.role}>
@@ -132,7 +133,7 @@
           </div>
         {/await}
         <button
-          class="h-10 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 px-8 py-0 text-[13px]"
+          class="h-10 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 px-6 py-0 text-[13px]"
           on:click={() => deleteUser(user.id)}
         >
           <TrashIcon class="text-[13px] text-gray-700" />
