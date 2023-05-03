@@ -98,6 +98,7 @@
       class=" w-56 bg-white pl-11"
       name="query"
       placeholder="Search users.."
+      maxlength="50"
       bind:value={query}
     />
   </div>
