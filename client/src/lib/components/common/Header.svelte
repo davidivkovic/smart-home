@@ -30,7 +30,14 @@
           Users
         </a>
       {/if}
-      <span class="ml-auto mr-1.5 text-sm">({$user.firstName} {$user.lastName})</span>
+      <a
+        href="/profile"
+        class="ml-auto mr-1.5 text-sm"
+        class:underline={$page.url.pathname === '/profile'}
+      >
+        ({$user.firstName}
+        {$user.lastName})
+      </a>
       <button type="button" class="p-0 text-sm font-medium" on:click={userStore.logout}>
         Log out
       </button>
