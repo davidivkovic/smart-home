@@ -1,17 +1,22 @@
 import { baseUrl, fetch } from '.'
 import userStore from '$lib/stores/userStore'
-import { data } from 'autoprefixer'
 
 const authUrl = baseUrl + '/auth'
 
-const login = async (email, password) => {
+const login = async (email, password, MFACode = null) => {
   const result = await fetch(`${authUrl}/login`, {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password, MFACode })
   })
 
-  const json = await result.json()
-  userStore.login(json.user, json.token)
+  const requires2FA =  result.status === 403
+
+  if(!requires2FA) {
+    const json = await result.json()
+    userStore.login(json.user, json.token)
+  }
+
+  return requires2FA
 }
 
 const signup = ({ email, password, firstName, lastName }) =>
