@@ -19,31 +19,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 @Path("auth")
 @Produces(MediaType.APPLICATION_JSON)
 public class Authentication extends Resource {
 
-    @GET
-    @Path("/example")
-    @Authenticated
-    public Response getExample() {
-        return ok(userId());
-    }
-
-    @GET
-    @Path("/me")
-    @Authenticated
-    public Response me(@Context SecurityContext ctx) {
-        return ok(ctx.getUserPrincipal());
-    }
-
     @POST
     @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response login(@Valid @NotNull AuthenticationRequest request) {
         var user = User.findByEmail(request.email);
 
@@ -51,6 +36,14 @@ public class Authentication extends Resource {
         if (!success) return badRequest("The credentials you entered are not valid.");
 
         if (!user.emailConfirmed) return badRequest("Please confirm your email address before logging in.");
+        if (user.lockedOut) return badRequest("Your account has been locked. Please contact an administrator.");
+
+        if (user.MFAEnabled) {
+            if (request.MFACode == null) return forbidden();
+            if (!user.verifyMFA(request.MFACode.trim())) return badRequest(
+                "The 2FA code you entered is not valid or has already expired."
+            );
+        }
 
         var token = User.generateToken(user);
         if (token == null) return badRequest("Could not log you in at this time. Please try again later.");
@@ -61,6 +54,7 @@ public class Authentication extends Resource {
 
     @POST
     @Path("/register")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response register(@Valid @NotNull RegistrationRequest request) {
         var user = User.findByEmail(request.email);
         if (user != null) return badRequest("A user with this email already exists.");
@@ -75,6 +69,7 @@ public class Authentication extends Resource {
 
     @POST
     @Path("/confirm")
+    
     public Response confirm(
         @QueryParam("email") @NotBlank @Size(max = 128) String email,
         @QueryParam("token") @NotBlank @Size(min = 6, max = 6) String token
@@ -125,14 +120,30 @@ public class Authentication extends Resource {
     @POST
     @Authenticated
     @Path("/2fa/confirm")
-    public Response confirm2FA(@QueryParam("ode") @NotNull int code) {
+    public Response confirm2FA(@QueryParam("code") @NotNull int code) {
+        User user = User.findById(new ObjectId(userId()));
+        if (user == null) return badRequest("A user with this email does not exist.");
+
+        if (user.MFASecret == null) return badRequest("2FA is not enabled for this user.");
+        if (user.MFAEnabled) return badRequest("2FA is already enabled for this user.");
+
+        var success = user.finishMFASetup(code);
+        if (!success) return badRequest("The 2FA code you entered is not valid or has already expired.");
+
+        return ok();
+    }
+
+    @POST
+    @Authenticated
+    @Path("/2fa/disable")
+    public Response disable2FA(@QueryParam("code") @NotBlank @Size(min = 6, max = 16) String code) {
         User user = User.findById(new ObjectId(userId()));
         if (user == null) return badRequest("A user with this email does not exist.");
 
         if (!user.MFAEnabled) return badRequest("2FA is not enabled for this user.");
 
-        var success = user.finishMFASetup(code);
-        if (!success) return badRequest("The code you entered is not valid or has already expired.");
+        var success = user.disableMFA(code);
+        if (!success) return badRequest("The 2FA code you entered is not valid or has already expired.");
 
         return ok();
     }
