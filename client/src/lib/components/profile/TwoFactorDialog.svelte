@@ -1,20 +1,17 @@
 <script>
-  import CopyIcon from '~icons/tabler/copy'
-  import Tooltip from './Tooltip.svelte'
   import { openDialog } from '$lib/stores/appStore'
-  import SuccessDialog from './SuccessDialog.svelte'
   import { confirm2fa } from '$lib/api/auth'
+  import SuccessDialog from './SuccessDialog.svelte'
+  import Tooltip from './Tooltip.svelte'
+  import Code from '../common/Code.svelte'
+  import CopyIcon from '~icons/tabler/copy'
 
   export let qr
   export let mfaSecret
   export let close
 
-  const inputCount = 6
-  const codeInputs = Array.from(Array(inputCount).keys())
-
   let error = ''
 
-  let inputContainer
   let tooltipOpen = false
 
   const copyCode = async () => {
@@ -24,43 +21,11 @@
     setTimeout(() => (tooltipOpen = false), 2000)
   }
 
-  const handlePaste = (e) => {
-    const paste = e.clipboardData.getData('text')
-    const inputs = inputContainer.childNodes
-    inputs.forEach((input, index) => (input.value = paste[index]))
-  }
+  const confirmCode = async (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const code = Array.from(formData.values()).join('')
 
-  const focusSibling = (sibling) => {
-    setTimeout(() => sibling.focus(), 0)
-  }
-
-  const handleInput = (e) => {
-    const input = e.target
-    const keyCode = e.key
-    const previousSibling = input.previousElementSibling
-    const nextSibling = input.nextElementSibling
-
-    if (keyCode === 'ArrowLeft' && previousSibling) {
-      focusSibling(previousSibling)
-    } else if (['ArrowRight', 'Tab'].includes(keyCode) && input.nextElementSibling) {
-      focusSibling(nextSibling)
-    } else if (keyCode === 'Backspace') {
-      input.value = ''
-      if (previousSibling) {
-        focusSibling(previousSibling)
-      }
-    } else if (Number(keyCode) || keyCode === '0') {
-      input.value = Number(keyCode)
-      if (nextSibling) {
-        focusSibling(nextSibling)
-      }
-    }
-  }
-
-  const confirmCode = async () => {
-    const code = Array.from(inputContainer.children)
-      .map((input) => input.value)
-      .join('')
     try {
       await confirm2fa(code)
       openDialog(SuccessDialog, {}, close)
@@ -128,19 +93,7 @@
         on:submit|preventDefault={confirmCode}
         class="mt-3 flex w-full flex-col items-center justify-center"
       >
-        <div bind:this={inputContainer} class="mt-4 flex w-1/2 min-w-fit justify-between gap-3">
-          {#each codeInputs as codeInput (codeInput)}
-            <input
-              required
-              type="text"
-              maxlength="1"
-              class="h-12 w-12 px-0 text-center text-base font-medium caret-transparent"
-              on:paste|preventDefault={handlePaste}
-              on:keydown={handleInput}
-              oninput="this.value =this.value.replace(/[^0-9.]/g, '').replace(/(..*?)..*/g,'$1');"
-            />
-          {/each}
-        </div>
+        <Code />
         {#if error}
           <p class="mt-3 text-[13px] text-red-500">{error}</p>
         {/if}

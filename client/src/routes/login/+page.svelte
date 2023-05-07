@@ -1,18 +1,33 @@
 <script>
   import { goto } from '$app/navigation'
   import { login } from '$lib/api/auth'
+  import CodeDialog from '$lib/components/common/CodeDialog.svelte'
+  import { openDialog } from '$lib/stores/appStore'
 
   let error = ''
 
   let email = ''
   let password = ''
 
+  const mfaLogin = async (code) => {
+    await login(email, password, code)
+    goto('/csrs')
+  }
+
   const loginUser = async () => {
     try {
-      await login(email, password)
-      goto('/csrs')
+      const reqires2FA = await login(email, password)
+      if (!reqires2FA) {
+        goto('/csrs')
+      } else {
+        openDialog(CodeDialog, {
+          title: 'Verify your code',
+          description: 'Enter the code we sent to your email',
+          callback: (code) => mfaLogin(code)
+        })
+      }
     } catch (err) {
-      error = err
+      error = err.message
     }
   }
 </script>

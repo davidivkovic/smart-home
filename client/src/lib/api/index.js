@@ -29,7 +29,7 @@ const fetch = async (url, init = {}) => {
     ...init
   })
 
-  if (!result.ok) {
+  if (!result.ok && result.status !== 403) {
     throw new Error(await result.text())
   }
 

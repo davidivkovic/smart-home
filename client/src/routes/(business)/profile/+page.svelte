@@ -12,6 +12,7 @@
       console.log(e)
     }
   }
+
 </script>
 
 <div class="h-full w-full">
@@ -22,7 +23,7 @@
       <h2 class="text-lg">Two-Factor Authentication</h2>
       <span class="text-xs text-green-500 font-semibold">(Enabled)</span>
     </div>
-    <div class="flex flex-col gap-2 mt-4">
+    <div class="flex flex-col gap-2 mt-4 text-sm">
       <p>
         Two-factor authentication (2FA) is a security mechanism that adds an extra layer of protection
         to your account beyond just a username and password.
@@ -33,7 +34,7 @@
       </p>
       <p>You can enable or disable this feature any time.</p>
     </div>
-    <!-- <button on:click={open2FADialog} class="primary w-fit mt-4">Enable 2FA</button> -->
+    <button on:click={open2FADialog} class="primary w-fit mt-4">Enable 2FA</button>
     <button class="secondary w-fit mt-4">Disable 2FA</button>
   </div>
 </div>
