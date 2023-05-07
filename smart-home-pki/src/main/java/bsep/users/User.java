@@ -63,6 +63,8 @@ public class User extends PanacheMongoEntity {
     public OTP otp;
     public boolean MFAEnabled;
     public String MFASecret;
+    public boolean lockedOut;
+    public int failedLoginAttempts;
 
     public static User register(String firstName, String lastName, String role, String email, String password) {
         User user = new User();
@@ -81,10 +83,27 @@ public class User extends PanacheMongoEntity {
         return user;
     }
 
+    public void incrementLockout() {
+        this.failedLoginAttempts++;
+        if (this.failedLoginAttempts >= 5) this.lockedOut = true;
+        this.update();
+    }
+
+    public void resetLockout() {
+        this.failedLoginAttempts = 0;
+        this.lockedOut = false;
+        this.update();
+    }
+
+    // Timing attack hardening, hash in constant time even if the user is null
     public static boolean authenticate(User user, String password) {
-        // Timing attack hardening, hash in constant time even if the user is null
         if (user == null) return PBKDF2.verify(password, User.emptySalt, User.emptyPassword);
-        return PBKDF2.verify(password, user.salt, user.password);
+        var success = PBKDF2.verify(password, user.salt, user.password);
+
+        if (success) user.resetLockout();
+        else user.incrementLockout();
+
+        return success;
     }
 
     public static String generateToken(User user) {
@@ -140,9 +159,8 @@ public class User extends PanacheMongoEntity {
         return this.role.equals(Roles.ADMIN);
     }
 
-    public String generateMFASecret() {
+    public void generateMFASecret() {
         this.MFASecret = TimeBasedOneTimePasswordUtil.generateBase32Secret();
-        return this.MFASecret;
     }
 
     public String generateMFAQRCode() {
@@ -179,8 +197,32 @@ public class User extends PanacheMongoEntity {
         return this.MFAEnabled;
     }
 
-    public boolean disableMFA(String recoveryCode) {
-        return false;
+    public boolean disableMFA(String code) {
+        if (!this.MFAEnabled || !verifyMFA(code)) return false;
+        this.MFAEnabled = false;
+        this.MFASecret = null;
+        this.update();
+        return true;
+    }
+
+    public boolean verifyMFA(String code) {
+        if (!this.MFAEnabled) return false;
+
+        boolean success = false;
+        try {
+            if (code.length() == 6) success = TimeBasedOneTimePasswordUtil.validateCurrentNumber(
+                this.MFASecret,
+                Integer.parseInt(code),
+                5000
+            );
+            else if (code.length() == 16) success = code.equalsIgnoreCase(this.MFASecret);
+        }
+        catch (Exception e) { /* Ignore */ }
+
+        if (success) this.resetLockout() ;
+        else this.incrementLockout();
+
+        return success;
     }
 
 }

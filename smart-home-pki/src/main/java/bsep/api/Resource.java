@@ -38,6 +38,10 @@ public class Resource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    public Response unauthorized() { return Response.status(Response.Status.UNAUTHORIZED).build(); }
+
+    public Response forbidden() { return Response.status(Response.Status.FORBIDDEN).build(); }
+
     public <T> Response validationProblem(Set<ConstraintViolation<T>> validation) {
         throw new ResteasyViolationExceptionImpl(validation, List.of(MediaType.APPLICATION_JSON_TYPE));
     }
