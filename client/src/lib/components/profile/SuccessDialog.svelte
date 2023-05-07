@@ -1,4 +1,6 @@
 <script>
+  import ArrowRight from '~icons/tabler/arrow-right'
+
   export let close
 
   const navigateToLogin = () => {
@@ -13,6 +15,7 @@
     code when logging in.
   </p>
   <button on:click={navigateToLogin} class="primary mt-6 flex items-center gap-2">
-    <span>Okay</span>
+    <span>Continue</span>
+    <ArrowRight />
   </button>
 </div>
