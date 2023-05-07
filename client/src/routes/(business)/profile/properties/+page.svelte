@@ -1,0 +1,1 @@
+<div>Objects page</div>

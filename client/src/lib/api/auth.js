@@ -1,5 +1,6 @@
 import { baseUrl, fetch } from '.'
 import userStore from '$lib/stores/userStore'
+import { data } from 'autoprefixer'
 
 const authUrl = baseUrl + '/auth'
 
@@ -29,4 +30,14 @@ const confirmEmail = ({ email, token }) =>
     method: 'POST'
   })
 
-export { login, signup, resendConfirmation, confirmEmail }
+const add2fa = async () => {
+  const data = await fetch(`${authUrl}/2fa/add`, { method: 'POST' })
+  return await data.json()
+}
+
+const confirm2fa = (code) =>
+  fetch(`${authUrl}/2fa/confirm?${new URLSearchParams({ code }).toString()}`, {
+    method: 'POST'
+  })
+
+export { login, signup, resendConfirmation, confirmEmail, add2fa, confirm2fa }

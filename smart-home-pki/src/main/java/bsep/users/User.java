@@ -3,6 +3,7 @@ package bsep.users;
 import bsep.crypto.PBKDF2;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.qrcode.QRCodeWriter;
 
@@ -183,7 +184,9 @@ public class User extends PanacheMongoEntity {
             );
             return Base64.getEncoder().encodeToString(stream.toByteArray());
         }
-        catch (Exception e) { return null; }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean finishMFASetup(int code) {

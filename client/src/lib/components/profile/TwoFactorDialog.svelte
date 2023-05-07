@@ -3,7 +3,10 @@
   import Tooltip from './Tooltip.svelte'
   import { openDialog } from '$lib/stores/appStore'
   import SuccessDialog from './SuccessDialog.svelte'
+  import { confirm2fa } from '$lib/api/auth'
 
+  export let qr
+  export let mfaSecret
   export let close
 
   const inputCount = 6
@@ -13,10 +16,6 @@
 
   let inputContainer
   let tooltipOpen = false
-
-  const qr =
-    'https://www.investopedia.com/thmb/hJrIBjjMBGfx0oa_bHAgZ9AWyn0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/qr-code-bc94057f452f4806af70fd34540f72ad.png'
-  const mfaSecret = 'SEDRFRGT3DRE5674'
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(mfaSecret)
@@ -58,13 +57,16 @@
     }
   }
 
-  const confirmCode = () => {
+  const confirmCode = async () => {
     const code = Array.from(inputContainer.children)
       .map((input) => input.value)
       .join('')
-
-    console.log(code)
-    openDialog(SuccessDialog, {}, close)
+    try {
+      await confirm2fa(code)
+      openDialog(SuccessDialog, {}, close)
+    } catch (e) {
+      error = e.message
+    }
   }
 </script>
 
@@ -88,14 +90,16 @@
     <p class="text-sm">
       Open the authenticator app and scan the image below using your phone's camera.
     </p>
-    <div class="mt-7 flex w-full justify-between gap-3">
-      <img src={qr} alt="QR code" class="h-48 w-48" />
+    <div class="mt-7 flex w-full justify-between gap-4">
+      <div class="relative -ml-1 h-48 w-48 overflow-clip">
+        <img src={qr} alt="QR code" class="absolute inset-auto h-full w-full scale-[115%]" />
+      </div>
       <div class="flex-1">
         <p class="text-[13px]">
           Can't scan the QR code? Enter the code below manually in your authenticator app.
         </p>
         <div
-          class="relative mt-3 flex items-center justify-between border border-neutral-300 bg-neutral-100 px-4 py-3 text-base font-medium"
+          class="relative mr-1 mt-3 flex items-center justify-between border border-neutral-300 bg-neutral-100 px-4 py-3 text-base font-medium"
         >
           <div class="flex gap-1.5">
             {#each mfaSecret.match(/.{1,4}/g) as group}
@@ -137,6 +141,9 @@
             />
           {/each}
         </div>
+        {#if error}
+          <p class="mt-3 text-[13px] text-red-500">{error}</p>
+        {/if}
         <div class="mt-12 flex w-full justify-between gap-3">
           <div class="flex items-center gap-3">
             <input required type="checkbox" id="confirm" />
