@@ -4,7 +4,6 @@ import bsep.users.User;
 
 import static bsep.users.User.Roles;
 
-import io.quarkus.security.Authenticated;
 import org.bson.types.ObjectId;
 
 import javax.annotation.security.RolesAllowed;
@@ -37,7 +36,9 @@ public class Users extends Resource {
     public Response deleteUser(@PathParam("id") @NotBlank String id) {
         User user = User.findById(new ObjectId(id));
         if(user == null) return badRequest("User does not exist");
+
         user.delete();
+
         return ok(user);
     }
 
@@ -50,7 +51,9 @@ public class Users extends Resource {
     {
         User user = User.findById(new ObjectId(id));
         if(user == null) return badRequest("User does not exist");
+
         user.updateRole(role);
+
         return ok();
     }
 
@@ -58,6 +61,6 @@ public class Users extends Resource {
     @Path("/roles")
     @RolesAllowed({ Roles.ADMIN })
     public Response getAllRoles() {
-        return ok(User.Roles.all);
+        return ok(Roles.all);
     }
 }

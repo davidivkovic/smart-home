@@ -9,8 +9,7 @@ public class RegistrationRequest {
     @NotBlank @Email @Size(max = 128)
     public String email;
 
-    // TODO: Password pattern validation
-    @NotBlank @Size(min = 6, max = 128)
+    @NotBlank @Size(min = 8, max = 128) @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).+$")
     public String password;
 
     @NotBlank @Size(max = 64) @Pattern(regexp = "[a-zA-Z\\s]*")

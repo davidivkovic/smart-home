@@ -11,6 +11,7 @@ import io.quarkus.security.Authenticated;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.types.ObjectId;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.Validator;
@@ -64,7 +65,7 @@ public class SigningRequests extends Resource {
 
     @GET
     @Path("/{id}")
-    // TODO: A user can only see their own signing requests, and an admin can see all of them
+    @Authenticated
     public Response get(@PathParam("id") @NotBlank @Size(max = 100) String id) {
 
         var csr = CSR.findById(new ObjectId(id));
@@ -75,6 +76,7 @@ public class SigningRequests extends Resource {
 
     @POST
     @Path("/{id}/approve")
+    @RolesAllowed({ User.Roles.ADMIN })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public Response approve(
         @PathParam("id") @NotBlank @Size(max = 100) String id,
@@ -131,6 +133,7 @@ public class SigningRequests extends Resource {
 
     @POST
     @Path("/{id}/reject")
+    @RolesAllowed({ User.Roles.ADMIN })
     @Produces(MediaType.TEXT_PLAIN)
     public Response reject(
         @PathParam("id") @NotBlank @Size(max = 100) String id,

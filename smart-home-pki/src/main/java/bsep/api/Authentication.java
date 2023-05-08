@@ -3,6 +3,7 @@ package bsep.api;
 import bsep.users.User;
 import bsep.email.ConfirmEmail;
 import bsep.api.dto.users.UserDTO;
+import bsep.util.SecurityUtils;
 import bsep.api.dto.authentication.AuthenticationRequest;
 import bsep.api.dto.authentication.AuthenticationResponse;
 import bsep.api.dto.authentication.Add2FAResponse;
@@ -59,17 +60,20 @@ public class Authentication extends Resource {
         var user = User.findByEmail(request.email);
         if (user != null) return badRequest("A user with this email already exists.");
 
+        if (SecurityUtils.isCommonPassword(request.password)) return badRequest(
+        "The password you entered is too easy to guess. Please choose a different one."
+        );
+
         user = User.register(request.firstName, request.lastName, User.Roles.TENANT, request.email, request.password);
         var otp = user.generateOTP();
 
         ConfirmEmail.send(user.email, user.firstName, otp.code);
 
-        return ok(otp);
+        return ok();
     }
 
     @POST
     @Path("/confirm")
-    
     public Response confirm(
         @QueryParam("email") @NotBlank @Size(max = 128) String email,
         @QueryParam("token") @NotBlank @Size(min = 6, max = 6) String token
@@ -96,7 +100,7 @@ public class Authentication extends Resource {
         var otp = user.generateOTP();
         ConfirmEmail.send(user.email, user.firstName, otp.code);
 
-        return ok(otp);
+        return ok();
     }
 
     @POST
@@ -114,7 +118,7 @@ public class Authentication extends Resource {
 
         user.update();
         var response = new Add2FAResponse(qr, user.MFASecret);
-        
+
         return ok(response);
     }
 
