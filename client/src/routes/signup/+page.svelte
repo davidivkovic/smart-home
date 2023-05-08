@@ -29,7 +29,7 @@
       await signup(data)
       goto(`/signup/${data.email}`)
     } catch (err) {
-      error = err
+      error = err.message
     }
   }
 </script>
