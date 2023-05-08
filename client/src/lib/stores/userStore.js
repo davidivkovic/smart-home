@@ -13,23 +13,28 @@ export const isAdmin = derived(user, ($user) => Object.keys($user).length > 0 &&
 
 const login = (newUser, accessToken) => {
   storage.setItem(userKey, JSON.stringify(newUser))
-  storage.setItem(tokenKey, accessToken)
+  setToken(accessToken)
   user.set(newUser)
 }
 
-const logout = () => {
+const logout = async () => {
   storage.removeItem(userKey)
   storage.removeItem(tokenKey)
   user.set({})
-  goto('/')
+  await goto('/')
 }
 
 const getToken = () => {
   return storage.getItem(tokenKey)
 }
 
+const setToken = (accessToken) => {
+  storage.setItem(tokenKey, accessToken)
+}
+
 export default {
   login,
   logout,
-  getToken
+  getToken,
+  setToken
 }

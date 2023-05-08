@@ -32,7 +32,7 @@
       }
 
       await callback(code)
-      close()
+      close('ok')
     } catch (e) {
       error = e.message
     }
