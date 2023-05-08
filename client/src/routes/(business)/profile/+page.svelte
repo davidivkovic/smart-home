@@ -5,6 +5,10 @@
   import TwoFactorDialog from '$lib/components/profile/TwoFactorDialog.svelte'
   import CodeDialog from '$lib/components/common/CodeDialog.svelte'
   import userStore from '$lib/stores/userStore.js'
+  import dayjs from 'dayjs/esm/index'
+  import relativeTime from 'dayjs/esm/plugin/relativeTime'
+
+  dayjs.extend(relativeTime)
 
   export let data
 
@@ -37,8 +41,7 @@
       await revokeRefreshToken(token.id)
       if (token.isThisDevice) await userStore.logout()
       else data.refreshTokens = data.refreshTokens.filter((t) => t.id !== token.id)
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e)
     }
   }
@@ -72,14 +75,24 @@
   </div>
 
   <h2 class="mt-5 text-lg">Devices</h2>
-  <div class="mt-2">
+  <div class="mt-2 border bg-white">
     {#each data.refreshTokens as token}
-      <div class="flex">
-        <p>{token.id}</p>
-        {#if token.isThisDevice}
-          <div>Current device</div>
-        {/if}
-        <button on:click={() => removeDevice(token)}>Log Out</button>
+      <div class="flex border border-neutral-300 bg-white p-5">
+        <div>
+          <div class="flex items-center">
+            <p class="font-medium">{token.name}</p>
+            {#if token.isThisDevice} 
+              <div class="h-2 w-2 rounded-full bg-[#40c82b] ml-2 mr-1"></div>
+              <span class="text-[13px] text-neutral-500 font-medium">Current device</span> 
+            {/if}
+          </div>
+          <p class="text-[13px] text-neutral-600">
+            Access expires {dayjs(token.expiresAt).fromNow()}
+          </p>
+        </div>
+        <button class="secondary ml-auto !py-2 h-min !text-sm" on:click={() => removeDevice(token)}>
+          {token.isThisDevice ? 'Log Out' : 'Remove'}
+        </button>
       </div>
     {/each}
   </div>
