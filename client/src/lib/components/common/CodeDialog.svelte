@@ -59,6 +59,7 @@
       class="mt-4"
       minlength="16"
       maxlength="16"
+      placeholder="Enter your 16 character secret"
     />
   {/if}
 
