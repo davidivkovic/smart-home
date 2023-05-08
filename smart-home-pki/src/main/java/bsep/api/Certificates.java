@@ -4,6 +4,7 @@ import bsep.certificates.CRL;
 import bsep.certificates.CSR;
 import bsep.certificates.CertificateService;
 
+import bsep.users.User;
 import io.quarkus.security.Authenticated;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -13,6 +14,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.constraints.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -44,6 +46,7 @@ public class Certificates extends Resource {
 
     @GET
     @Path("/ca")
+    @Authenticated
     public Response getCA() {
 
         var aliasedCertificates = new HashMap<String, String>();
@@ -86,6 +89,7 @@ public class Certificates extends Resource {
 
     @POST
     @Path("/check-validity")
+    @Authenticated
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkValidity(@NotBlank @Size(max = 32000) String pemChain) {
@@ -147,6 +151,7 @@ public class Certificates extends Resource {
      */
     @POST
     @Path("/{serial-number}/revoke")
+    @RolesAllowed({ User.Roles.ADMIN })
     @Produces(MediaType.TEXT_PLAIN)
     public Response revoke(
         @PathParam("serial-number") @NotBlank @Size(max = 128) @Pattern(regexp = "^[0-9a-zA-Z]+$") String serialNumber,
