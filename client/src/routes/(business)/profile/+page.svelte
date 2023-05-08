@@ -56,16 +56,16 @@
         <span class="text-xs font-semibold text-green-500">(Enabled)</span>
       {/if}
     </div>
-    <div class="mt-3 flex flex-col gap-2 text-sm">
-      <p>
+    <div class="mt-3 flex flex-col gap-2">
+      <p class="text-sm">
         Two-factor authentication (2FA) is a security mechanism that adds an extra layer of
         protection to your account beyond just a username and password.
       </p>
-      <p>
+      <p class="text-sm">
         When you're logging in to your account with two-factor authentication enabled, you'll need
         to provide a code from the authenticator app before accessing your account.
       </p>
-      <p>You can enable or disable this feature any time.</p>
+      <p class="text-sm">You can enable or disable this feature any time.</p>
     </div>
     {#if data.mfaEnabled}
       <button on:click={disable2FA} class="secondary mt-4 w-fit">Disable 2FA</button>
@@ -74,16 +74,17 @@
     {/if}
   </div>
 
-  <h2 class="mt-5 text-lg">Devices</h2>
-  <div class="mt-2 border bg-white">
+  <h2 class="mt-6 text-lg">Devices</h2>
+  <p class="text-sm">These are the devices you are currently logged in from.</p>
+  <div class="mt-4">
     {#each data.refreshTokens as token}
-      <div class="flex border border-neutral-300 bg-white p-5">
+      <div class="flex border border-neutral-300 bg-white p-5 mb-2">
         <div>
           <div class="flex items-center">
             <p class="font-medium">{token.name}</p>
             {#if token.isThisDevice} 
               <div class="h-2 w-2 rounded-full bg-[#40c82b] ml-2 mr-1"></div>
-              <span class="text-[13px] text-neutral-500 font-medium">Current device</span> 
+              <span class="text-[13px] text-neutral-700">Current device</span> 
             {/if}
           </div>
           <p class="text-[13px] text-neutral-600">
