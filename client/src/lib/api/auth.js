@@ -1,5 +1,4 @@
 import { baseUrl, fetch } from '.'
-import userStore from '$lib/stores/userStore'
 
 const authUrl = baseUrl + '/auth'
 
@@ -9,10 +8,11 @@ const login = async (email, password, MFACode = null) => {
     body: JSON.stringify({ email, password, MFACode })
   })
 
-  const requires2FA =  result.status === 403
+  const requires2FA = result.status === 403
 
-  if(!requires2FA) {
+  if (!requires2FA) {
     const json = await result.json()
+    const userStore = await import('$lib/stores/userStore').then((m) => m.default)
     userStore.login(json.user, json.token)
   }
 
@@ -40,9 +40,41 @@ const add2fa = async () => {
   return await data.json()
 }
 
-const confirm2fa = (code) =>
-  fetch(`${authUrl}/2fa/confirm?${new URLSearchParams({ code }).toString()}`, {
+const confirm2fa = async (code) => {
+  await fetch(`${authUrl}/2fa/confirm?${new URLSearchParams({ code }).toString()}`, {
     method: 'POST'
   })
+}
 
-export { login, signup, resendConfirmation, confirmEmail, add2fa, confirm2fa }
+const disable2fa = async (code) => {
+  await fetch(`${authUrl}/2fa/disable?${new URLSearchParams({ code }).toString()}`, {
+    method: 'POST'
+  })
+}
+
+const get2faStatus = async () => {
+  const response = await fetch(`${authUrl}/2fa/status`)
+  return await response.json()
+}
+
+const getRefreshTokens = async () => {
+  const data = await fetch(`${authUrl}/refresh-tokens`)
+  return await data.json()
+}
+
+const revokeRefreshToken = async (id) => {
+  await fetch(`${authUrl}/refresh-tokens/${id}/revoke`, { method: 'POST' })
+}
+
+export {
+  login,
+  signup,
+  resendConfirmation,
+  confirmEmail,
+  add2fa,
+  confirm2fa,
+  getRefreshTokens,
+  get2faStatus,
+  disable2fa,
+  revokeRefreshToken
+}

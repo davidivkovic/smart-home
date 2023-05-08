@@ -28,14 +28,14 @@
 
     try {
       await confirm2fa(code)
-      openDialog(SuccessDialog, {}, close)
+      openDialog(SuccessDialog, {}, () => close('ok'))
     } catch (e) {
       error = e.message
     }
   }
 </script>
 
-<div class="w-[500px]">
+<div class="w-[500px] px-2">
   <h2 class="text-2xl">Two-Factor Authentication</h2>
 
   <div class="mt-7">

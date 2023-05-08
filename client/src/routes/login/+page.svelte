@@ -11,7 +11,7 @@
 
   const mfaLogin = async (code) => {
     await login(email, password, code)
-    goto('/csrs')
+    await goto('/csrs')
   }
 
   const loginUser = async () => {
@@ -22,7 +22,7 @@
       } else {
         openDialog(CodeDialog, {
           title: 'Verify your code',
-          description: 'Enter the code we sent to your email',
+          description: 'Enter the six digit code displayed in your authenticator application',
           callback: (code) => mfaLogin(code)
         })
       }

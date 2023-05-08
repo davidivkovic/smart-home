@@ -101,21 +101,30 @@ public class User extends PanacheMongoEntity {
         if (user == null) return PBKDF2.verify(password, User.emptySalt, User.emptyPassword);
         var success = PBKDF2.verify(password, user.salt, user.password);
 
-        if (success) user.resetLockout();
+        if (!user.lockedOut && success) user.resetLockout();
         else user.incrementLockout();
 
         return success;
     }
 
-    public static String generateToken(User user) {
+    public String generateToken() {
         return Jwt
             .issuer("http://localhost:8080/auth")
             .audience("http://localhost:5173")
-            .upn(user.id.toString())
-            .subject(user.email)
-            .groups(new HashSet<>(List.of(user.role)))
-            .expiresIn(Duration.ofHours(24))
+            .upn(this.id.toString())
+            .subject(this.email)
+            .groups(new HashSet<>(List.of(this.role)))
+            .expiresIn(Duration.ofHours(1))
             .sign();
+    }
+
+    public String generateRefreshToken(String userAgent) {
+        if (userAgent == null || userAgent.trim().isEmpty()) return null;
+
+        var token = new RefreshToken(this.id.toString(), userAgent);
+        token.persist();
+
+        return token.value;
     }
 
     public OTP generateOTP() {
@@ -209,9 +218,11 @@ public class User extends PanacheMongoEntity {
     }
 
     public boolean verifyMFA(String code) {
-        if (!this.MFAEnabled) return false;
+        if (!this.MFAEnabled || code == null) return false;
 
         boolean success = false;
+        code = code.trim();
+
         try {
             if (code.length() == 6) success = TimeBasedOneTimePasswordUtil.validateCurrentNumber(
                 this.MFASecret,
@@ -222,7 +233,7 @@ public class User extends PanacheMongoEntity {
         }
         catch (Exception e) { /* Ignore */ }
 
-        if (success) this.resetLockout() ;
+        if (!this.lockedOut && success) this.resetLockout() ;
         else this.incrementLockout();
 
         return success;

@@ -63,4 +63,16 @@ public class Users extends Resource {
     public Response getAllRoles() {
         return ok(Roles.all);
     }
+
+    @POST
+    @Path("/{id}/unlock")
+    @RolesAllowed({ Roles.ADMIN })
+    public Response unlockUser(@PathParam("id") @NotBlank @Size(max = 128) String id) {
+        User user = User.findById(new ObjectId(id));
+        if(user == null) return badRequest("User does not exist");
+
+        user.resetLockout();
+
+        return ok();
+    }
 }

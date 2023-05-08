@@ -18,8 +18,13 @@ public class Resource {
         return Response.ok().build();
     }
 
-    public Response ok(Object entity) {
-        return Response.ok(entity).build();
+    public Response ok(Object entity) { return Response.ok(entity).build(); }
+
+    public Response ok(NewCookie... cookie) {
+        return Response.ok(null).cookie(cookie).build();
+    }
+    public Response ok(Object entity, NewCookie... cookie) {
+        return Response.ok(entity).cookie(cookie).build();
     }
 
     public Response ok(Object entity, String mediaType) {
