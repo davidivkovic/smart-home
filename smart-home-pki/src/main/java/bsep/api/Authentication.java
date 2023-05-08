@@ -106,14 +106,15 @@ public class Authentication extends Resource {
         User user = User.findById(new ObjectId(userId()));
         if (user == null) return badRequest("A user with this email does not exist.");
 
-        if (!user.MFAEnabled) user.generateMFASecret();
-        var qr = user.generateMFAQRCode();
+        if (user.MFAEnabled) return badRequest("2FA is already enabled for this user.");
+        else user.generateMFASecret();
 
+        var qr = user.generateMFAQRCode();
         if (qr == null) return badRequest("Could not enable 2FA. Please try again later.");
 
         user.update();
         var response = new Add2FAResponse(qr, user.MFASecret);
-
+        
         return ok(response);
     }
 
