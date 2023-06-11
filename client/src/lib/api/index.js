@@ -2,6 +2,7 @@
 import { get } from 'svelte/store'
 
 const baseUrl = 'http://localhost:8080'
+const baseUrlDevices = 'http://localhost:8081'
 
 /**
  *
@@ -58,4 +59,4 @@ const fetch = async (url, init = {}) => {
   return result
 }
 
-export { fetch, baseUrl }
+export { fetch, baseUrl, baseUrlDevices }

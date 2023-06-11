@@ -62,6 +62,7 @@
       <input
         bind:value={password}
         required
+        pattern=".{'{'}6,{'}'}"
         type="password"
         placeholder="Your password"
         autocomplete="current-password"
