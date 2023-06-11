@@ -37,7 +37,7 @@
 
 <div class="flex">
   <div>
-    <h1 class="text-xl">Buildings page</h1>
+    <h1 class="text-xl">Buildings</h1>
     <p class="text-sm">View and manage your buildings</p>
   </div>
   {#if $isLandlord}
