@@ -4,8 +4,9 @@ import bsep.devices.Device;
 
 public class AddDeviceRequest {
 
-    public String deviceName;
-    public int deviceTypeId;
+    public String name;
+    public String brand;
+    public int typeId;
     public String buildingId;
 
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 public class Device extends PanacheMongoEntity {
 
     public String name;
+    public String brand;
     public String ownerId;
     public String buildingId;
     public DeviceType type;
@@ -92,8 +93,9 @@ public class Device extends PanacheMongoEntity {
         )
     );
 
-    public Device(String name, String ownerId, String buildingId, DeviceType type) {
+    public Device(String name, String brand, String ownerId, String buildingId, DeviceType type) {
         this.name = name;
+        this.brand = brand;
         this.ownerId = ownerId;
         this.buildingId = buildingId;
         this.type = type;
