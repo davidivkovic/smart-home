@@ -31,6 +31,13 @@
         </a>
       {/if}
       <a
+        href="/buildings"
+        class="ml-4 text-sm font-medium underline-offset-2"
+        class:underline={$page.url.pathname === '/buildings'}
+      >
+        Buildings
+      </a>
+      <a
         href="/profile"
         class="ml-auto mr-1.5 text-sm"
         class:underline={$page.url.pathname === '/profile'}

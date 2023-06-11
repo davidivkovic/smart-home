@@ -1,0 +1,47 @@
+<script>
+  import { addBuilding } from '$lib/api/buildings'
+  import BuildingTypePicker from './BuildingTypePicker.svelte'
+
+  export let buildingTypes
+  export let close
+  let error = ''
+
+  const saveBuilding = async (event) => {
+    const data = Object.fromEntries(new FormData(event.target))
+    const { name, address, type } = data
+    try {
+      await addBuilding(name, address, type)
+      close()
+    } catch(err) {
+      error = err
+    }
+  }
+</script>
+
+<form class="w-[450px]" on:submit|preventDefault={saveBuilding}>
+  <h2 class="text-xl">Add a building</h2>
+  <p class="text-sm">Fill data about the building you want to monitor</p>
+  <div class="mt-5 flex flex-col gap-1">
+    <label for="email">Name</label>
+    <input required type="search" name="name" placeholder="Building name" autocomplete="off" />
+  </div>
+  <div class="mt-5 flex flex-col gap-1">
+    <label for="email">Address</label>
+    <input
+      required
+      type="text"
+      name="address"
+      placeholder="Building address"
+      autocomplete="address-level1"
+    />
+  </div>
+  <div class="mt-5 flex flex-col gap-1">
+    <label for="email">Type</label>
+    <BuildingTypePicker types={buildingTypes} />
+  </div>
+  <p class="mt-2 text-center text-sm text-red-600">{error}</p>
+  <button
+    class="secondary -ml-0.5 mt-8 flex w-full items-center justify-center gap-x-2 !py-2.5 !text-sm"
+    >Add building</button
+  >
+</form>

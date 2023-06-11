@@ -7,4 +7,17 @@ const getBuildingTypes = async () => {
   return await response.json()
 }
 
-export { getBuildingTypes }
+const getBuildings = async () => { 
+  const response = await fetch(buildingsUrl)
+  return await response.json()
+}
+
+const addBuilding = async (name, address, type) => { 
+  const response = await fetch(buildingsUrl, {
+    method: 'POST',
+    body: JSON.stringify({ name, address, type })
+  })
+  return await response.json()
+}
+
+export { getBuildingTypes, getBuildings, addBuilding }
