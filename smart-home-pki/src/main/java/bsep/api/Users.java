@@ -21,7 +21,7 @@ public class Users extends Resource {
 
     @GET
     @Path("/")
-    @RolesAllowed({ Roles.ADMIN })
+    @RolesAllowed({ Roles.ADMIN, Roles.LANDLORD })
     public Response getAllUsers(
             @QueryParam("query") @Size(max = 128) @Pattern(regexp = "[a-zA-Z\\s]*") String query,
             @QueryParam("page") @NotNull int page)
