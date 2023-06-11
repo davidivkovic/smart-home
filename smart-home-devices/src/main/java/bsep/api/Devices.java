@@ -27,10 +27,10 @@ public class Devices extends Resource {
 //    @Authenticated
     public Response addDevice(@Valid AddDeviceRequest request)
     {
-        var deviceType = Device.getTypeById(request.deviceTypeId);
+        var deviceType = Device.getTypeById(request.typeId);
         if (deviceType == null) return badRequest("This device type does not exist.");
 
-        var device = new Device(request.deviceName, "userid", request.buildingId, deviceType);
+        var device = new Device(request.name, request.brand, "userid", request.buildingId, deviceType);
         device.persist();
 
         return ok(device);
