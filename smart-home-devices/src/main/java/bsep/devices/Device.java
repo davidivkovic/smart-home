@@ -36,62 +36,69 @@ public class Device extends PanacheMongoEntity {
     );
 
     public static class DeviceType {
+
+        public String name;
         public int id;
         public DeviceCategory category;
         public String categoryName;
-        public String name;
-        public String image;
 
-        public DeviceType(int id, DeviceCategory category, String name, String image) {
+        public DeviceType() {}
+
+        public DeviceType(int id, DeviceCategory category, String name) {
             this.id = id;
             this.category = category;
             this.name = name;
-            this.image = image;
             this.categoryName = categories.get(category);
+        }
+
+        public String getImage() {
+            return "/images/" + this.id + "_" + this.category.name().toLowerCase() + ".png";
         }
     }
 
-    public static Map<DeviceCategory, List<DeviceType>> devices = Map.of(
-        DeviceCategory.HOUSEHOLD_SECURITY, List.of(
-            new DeviceType(1, DeviceCategory.HOUSEHOLD_SECURITY, "Video camera", "video_camera.png"),
-            new DeviceType(2, DeviceCategory.HOUSEHOLD_SECURITY, "Visible Doorbell", "visible_doorbell.png")
+    public static List<List<DeviceType>> devices = List.of(
+        List.of(
+            new DeviceType(1, DeviceCategory.HOUSEHOLD_SECURITY, "Video camera"),
+            new DeviceType(2, DeviceCategory.HOUSEHOLD_SECURITY, "Visible Doorbell")
         ),
-        DeviceCategory.LIGHTING, List.of(
-            new DeviceType(3, DeviceCategory.LIGHTING, "Light strips", "light_strips.png"),
-            new DeviceType(4, DeviceCategory.LIGHTING, "Desk lamp", "desk_lamp.png"),
-            new DeviceType(5, DeviceCategory.LIGHTING, "Bedside lamp", "bedside_lamp.png"),
-            new DeviceType(6, DeviceCategory.LIGHTING, "Ceiling light", "ceiling_light.png"),
-            new DeviceType(7, DeviceCategory.LIGHTING, "Pendant lamp", "pendant_lamp.png"),
-            new DeviceType(8, DeviceCategory.LIGHTING, "Light bulb", "light_bulb.png")
+        List.of(
+            new DeviceType(3, DeviceCategory.LIGHTING, "Light strips"),
+            new DeviceType(4, DeviceCategory.LIGHTING, "Desk lamp"),
+            new DeviceType(5, DeviceCategory.LIGHTING, "Bedside lamp"),
+            new DeviceType(6, DeviceCategory.LIGHTING, "Ceiling light"),
+            new DeviceType(7, DeviceCategory.LIGHTING, "Pendant lamp"),
+            new DeviceType(8, DeviceCategory.LIGHTING, "Light bulb")
         ),
-        DeviceCategory.POWER_SWITCH, List.of(
-            new DeviceType(9, DeviceCategory.POWER_SWITCH, "Power outlet", "power_outlet.png"),
-            new DeviceType(10, DeviceCategory.POWER_SWITCH, "Light switch", "light_switch.png")
+        List.of(
+            new DeviceType(9, DeviceCategory.POWER_SWITCH, "Power outlet"),
+            new DeviceType(10, DeviceCategory.POWER_SWITCH, "Light switch")
         ),
-        DeviceCategory.SENSOR, List.of(
-            new DeviceType(11, DeviceCategory.SENSOR, "Temperature/Humidity sensor", "temp_hum_sensor.png"),
-            new DeviceType(12, DeviceCategory.SENSOR, "Water leak sensor", "water_sensor.png"),
-            new DeviceType(13, DeviceCategory.SENSOR, "Window/Door sensor", "win_door_sensor.png"),
-            new DeviceType(14, DeviceCategory.SENSOR, "Photosensor", "photo_sensor.png")
+        List.of(
+            new DeviceType(11, DeviceCategory.SENSOR, "Temperature/Humidity sensor"),
+            new DeviceType(12, DeviceCategory.SENSOR, "Water leak sensor"),
+            new DeviceType(13, DeviceCategory.SENSOR, "Window/Door sensor"),
+            new DeviceType(14, DeviceCategory.SENSOR, "Photosensor")
         ),
-        DeviceCategory.AIR_TREATMENT, List.of(
-            new DeviceType(15, DeviceCategory.AIR_TREATMENT, "Air humidifier", "humidifier.png"),
-            new DeviceType(16, DeviceCategory.AIR_TREATMENT, "Electric heater", "heater.png"),
-            new DeviceType(17, DeviceCategory.AIR_TREATMENT, "Air conditioner", "conditioner.png"),
-            new DeviceType(18, DeviceCategory.AIR_TREATMENT, "Air Purifier", "purifier.png")
+        List.of(
+            new DeviceType(15, DeviceCategory.AIR_TREATMENT, "Air humidifier"),
+            new DeviceType(16, DeviceCategory.AIR_TREATMENT, "Electric heater"),
+            new DeviceType(17, DeviceCategory.AIR_TREATMENT, "Air conditioner"),
+            new DeviceType(18, DeviceCategory.AIR_TREATMENT, "Air Purifier")
         ),
-        DeviceCategory.ROUTER_AND_GATEWAY, List.of(
-            new DeviceType(19, DeviceCategory.ROUTER_AND_GATEWAY, "Router", "router.png"),
-            new DeviceType(20, DeviceCategory.ROUTER_AND_GATEWAY, "Gateway", "gateway.png")
+        List.of(
+            new DeviceType(19, DeviceCategory.ROUTER_AND_GATEWAY, "Router"),
+            new DeviceType(20, DeviceCategory.ROUTER_AND_GATEWAY, "Gateway")
         ),
-        DeviceCategory.KITCHEN_ELECTRONICS, List.of(
-            new DeviceType(21, DeviceCategory.KITCHEN_ELECTRONICS, "Air fryer ", "air_fryer.png"),
-            new DeviceType(22, DeviceCategory.KITCHEN_ELECTRONICS, "Dishwasher", "dishwasher.png")
+        List.of(
+            new DeviceType(21, DeviceCategory.KITCHEN_ELECTRONICS, "Air fryer "),
+            new DeviceType(22, DeviceCategory.KITCHEN_ELECTRONICS, "Dishwasher")
         ),
-        DeviceCategory.CLEANING_APPLIANCES, List.of(
-            new DeviceType(23, DeviceCategory.CLEANING_APPLIANCES, "Robot vacuum", "robot_vacuum.png")
+        List.of(
+            new DeviceType(23, DeviceCategory.CLEANING_APPLIANCES, "Robot vacuum")
         )
     );
+
+    public Device() {}
 
     public Device(String name, String brand, String ownerId, String buildingId, DeviceType type) {
         this.name = name;
@@ -102,8 +109,8 @@ public class Device extends PanacheMongoEntity {
     }
 
     public static DeviceType getTypeById(int id) {
-        for (DeviceCategory category : devices.keySet()) {
-            for (DeviceType type : devices.get(category)) {
+        for (var category : devices) {
+            for (var type : category) {
                 if (type.id == id) {
                     return type;
                 }

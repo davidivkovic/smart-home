@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 public class Devices extends Resource {
 
     @GET
-    @Path("/")
+    @Path("/types")
     public Response getDeviceTypes()
     {
         return ok(Device.devices);
