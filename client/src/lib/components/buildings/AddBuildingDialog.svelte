@@ -10,9 +10,9 @@
     const data = Object.fromEntries(new FormData(event.target))
     const { name, address, type } = data
     try {
-      await addBuilding(name, address, type)
+      await addBuilding(name.trim(), address.trim(), type)
       close()
-    } catch(err) {
+    } catch (err) {
       error = err
     }
   }
@@ -21,19 +21,29 @@
 <form class="w-[450px]" on:submit|preventDefault={saveBuilding}>
   <h2 class="text-xl">Add a building</h2>
   <p class="text-sm">Fill data about the building you want to monitor</p>
-  <div class="mt-5 flex flex-col gap-1">
-    <label for="email">Name</label>
-    <input required type="search" name="name" placeholder="Building name" autocomplete="off" />
-  </div>
-  <div class="mt-5 flex flex-col gap-1">
-    <label for="email">Address</label>
-    <input
-      required
-      type="text"
-      name="address"
-      placeholder="Building address"
-      autocomplete="address-level1"
-    />
+  <div class="flex gap-3">
+    <div class="mt-5 flex flex-col gap-1">
+      <label for="email">Name</label>
+      <input
+        required
+        type="search"
+        name="name"
+        placeholder="Building name"
+        autocomplete="off"
+        maxlength="100"
+      />
+    </div>
+    <div class="mt-5 flex flex-col gap-1">
+      <label for="email">Address</label>
+      <input
+        required
+        type="text"
+        name="address"
+        placeholder="Building address"
+        autocomplete="address-level1"
+        maxlength="100"
+      />
+    </div>
   </div>
   <div class="mt-5 flex flex-col gap-1">
     <label for="email">Type</label>
