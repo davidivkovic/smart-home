@@ -26,4 +26,14 @@ const deleteBuilding = async (id) => {
   })
 }
 
-export { getBuildingTypes, getBuildings, addBuilding, deleteBuilding }
+const setTenants = async (id, tenantIds) => {
+  await fetch(
+    buildingsUrl +
+      `/${id}/tenants?${new URLSearchParams(tenantIds.map((id) => ['tenantIds', id])).toString()}`,
+    {
+      method: 'POST'
+    }
+  )
+}
+
+export { getBuildingTypes, getBuildings, addBuilding, deleteBuilding, setTenants }
