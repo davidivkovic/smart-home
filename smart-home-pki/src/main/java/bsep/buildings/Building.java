@@ -12,7 +12,7 @@ public class Building extends PanacheMongoEntity {
         APARTMENT,
         HOUSE,
         BUSINESS,
-        OTHER
+        GARAGE
     }
 
     public static class BuildingType {
@@ -53,7 +53,7 @@ public class Building extends PanacheMongoEntity {
         new BuildingType(BuildingCategory.APARTMENT, "Apartment"),
         new BuildingType(BuildingCategory.HOUSE, "House"),
         new BuildingType(BuildingCategory.BUSINESS, "Business"),
-        new BuildingType(BuildingCategory.OTHER, "Other")
+        new BuildingType(BuildingCategory.GARAGE, "Garage")
     );
 
 }
