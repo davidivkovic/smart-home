@@ -20,7 +20,7 @@
 
 <form class="w-[450px]" on:submit|preventDefault={saveBuilding}>
   <h2 class="text-xl">Add a building</h2>
-  <p class="text-sm">Fill data about the building you want to monitor</p>
+  <p class="text-sm">Fill in the data about the building you want to monitor</p>
   <div class="flex gap-3">
     <div class="mt-5 flex flex-col gap-1">
       <label for="email">Name</label>
@@ -46,12 +46,18 @@
     </div>
   </div>
   <div class="mt-5 flex flex-col gap-1">
-    <label for="email">Type</label>
+    <label for="email" class="mb-2">
+      <span>
+        Category
+      </span>
+      <span class="block text-xs text-gray-500">
+        Select the category that most suits your building
+      </span>
+    </label>
     <BuildingTypePicker types={buildingTypes} />
   </div>
   <p class="mt-2 text-center text-sm text-red-600">{error}</p>
-  <button
-    class="secondary -ml-0.5 mt-8 flex w-full items-center justify-center gap-x-2 !py-2.5 !text-sm"
-    >Add building</button
-  >
+  <button class="primary mt-6 flex w-full items-center justify-center gap-x-2 !py-2.5 !text-sm">
+    Add building
+  </button>
 </form>

@@ -5,7 +5,7 @@
     'APARTMENT': 'Single apartment',
     'HOUSE': 'Residential building',
     'BUSINESS': 'Commercial building',
-    'OTHER': 'Other buildings',
+    'GARAGE': 'Garage / Warehouse',
   }
 </script>
 
@@ -22,10 +22,10 @@
       />
       <label
         for={type.category}
-        class="relative block w-full cursor-pointer border border-neutral-300  peer-checked:outline peer-checked:outline-black"
+        class="relative block w-full hover:border-black cursor-pointer border border-neutral-300 peer-checked:border-black transition"
       >
         <div class="flex h-fit w-full items-center gap-4 px-4 py-5">
-          <img width="40" height="40" src={type.image} class="grayscale brightness-105" alt={`type.categoryName`} />
+          <img width="40" height="40" src={type.image} class="" alt={`type.categoryName`} />
           <div>
             <p class="text-sm text-black">{type.categoryName}</p>
             <p class="text-xs text-neutral-500">{descriptions[type.category]}</p>
