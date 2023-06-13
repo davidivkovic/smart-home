@@ -12,6 +12,7 @@
   let foundUsers = []
   let query = ''
   let timer
+  let loading = false
 
   let dropdownOpen = false
   $: dropdownOpen = query.length > 0
@@ -21,14 +22,17 @@
     const queryString = e.target.value?.trim() ?? ''
     timer = setTimeout(async () => {
       query = queryString
+      if(query.length === 0) return (foundUsers = [])
+      loading = true
       query && (await searchUsers(query))
-    }, 300)
+      loading = false
+    }, 500)
   }
 
   const searchUsers = async (query) => {
     try {
-      foundUsers = await getAll(1, query)
-      foundUsers = foundUsers.filter(
+      const newUsers = await getAll(1, query)
+      foundUsers = newUsers.filter(
         (u) =>
           u.id !== $user.id &&
           tenants.every((u1) => {
@@ -88,7 +92,7 @@
         <div
           class="absolute top-[45px] h-fit w-full divide-y-[1px] border border-t-0 border-neutral-300 bg-white shadow-lg"
         >
-          {#if foundUsers.length === 0 && query.length > 0}
+          {#if foundUsers.length === 0 && query.length > 0 && !loading}
             <div class="w-full p-3">
               <p class="text-center text-sm">No users found</p>
             </div>
