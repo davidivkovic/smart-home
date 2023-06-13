@@ -1,6 +1,7 @@
 package bsep.api;
 
 import bsep.api.dto.devices.AddDeviceRequest;
+import bsep.buildings.Building;
 import bsep.devices.Device;
 
 import io.quarkus.security.Authenticated;
@@ -33,6 +34,11 @@ public class Devices extends Resource {
         var deviceType = Device.getTypeById(request.typeId);
         if (deviceType == null) return badRequest("This device type does not exist.");
 
+        Building building = Building.findById(new ObjectId(request.buildingId));
+        if (building == null) return badRequest("This building does not exist.");
+
+        if (!isAdmin() && !building.landlordId.equals(userId())) return forbidden();
+
         var device = new Device(request.name, request.brand, userId(), request.buildingId, deviceType);
         device.persist();
 
@@ -47,6 +53,11 @@ public class Devices extends Resource {
         Device device = Device.findById(new ObjectId(deviceId));
         if (device == null) return badRequest("This device does not exist.");
 
+        Building building = Building.findById(new ObjectId(device.buildingId));
+        if (building == null) return badRequest("This building does not exist.");
+
+        if (!isAdmin() && !building.visibleTo(userId())) return forbidden();
+
         return ok(device);
     }
 
@@ -58,6 +69,8 @@ public class Devices extends Resource {
         Device device = Device.findById(new ObjectId(deviceId));
         if (device == null) return badRequest("This device does not exist.");
 
+        if (!isAdmin() && !device.ownerId.equals(userId())) return forbidden();
+
         device.delete();
 
         return ok();
@@ -66,7 +79,7 @@ public class Devices extends Resource {
     @POST
     @Authenticated
     @Path("/{id}/config")
-    public Response pushEvent(
+    public Response updateConfig(
             @PathParam("id") String deviceId,
             @QueryParam("regex") String regex,
             @QueryParam("interval") int interval
@@ -74,6 +87,8 @@ public class Devices extends Resource {
     {
         Device device = Device.findById(new ObjectId(deviceId));
         if (device == null) return badRequest("This device does not exist.");
+
+        if (!isAdmin() && !device.ownerId.equals(userId())) return forbidden();
 
         device.setConfig(regex, interval);
 

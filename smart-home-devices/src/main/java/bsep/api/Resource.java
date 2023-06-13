@@ -60,4 +60,8 @@ public class Resource {
         return securityContext.getUserPrincipal().getName();
     }
 
+    public boolean isAdmin() {
+        return securityContext.isUserInRole("admin");
+    }
+
 }
