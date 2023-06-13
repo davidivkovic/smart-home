@@ -21,25 +21,20 @@
     const queryString = e.target.value?.trim() ?? ''
     timer = setTimeout(async () => {
       query = queryString
-      console.log(query)
       query && (await searchUsers(query))
     }, 300)
   }
 
   const searchUsers = async (query) => {
-    console.log(tenants)
     try {
       foundUsers = await getAll(1, query)
-      console.log(tenants)
       foundUsers = foundUsers.filter(
         (u) =>
           u.id !== $user.id &&
           tenants.every((u1) => {
-            console.log('IDS:', u1.id, u.id)
             return u1.id !== u.id
           })
       )
-      console.log(foundUsers)
     } catch (err) {
       console.log(err)
     }
@@ -57,7 +52,6 @@
   }
 
   const saveChanges = async () => {
-    console.log('saving')
     try {
       await setTenants(
         buildingId,
