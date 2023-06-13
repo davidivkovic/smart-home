@@ -13,6 +13,9 @@ public class Device extends PanacheMongoEntity {
     public String buildingId;
     public DeviceType type;
 
+    public String eventPushRegex = ".*";
+    public int eventPushIntervalSeconds = 15;
+
     public enum DeviceCategory {
         HOUSEHOLD_SECURITY,
         LIGHTING,
@@ -117,6 +120,12 @@ public class Device extends PanacheMongoEntity {
             }
         }
         return null;
+    }
+
+    public void setConfig(String regex, int interval) {
+        this.eventPushRegex = regex;
+        this.eventPushIntervalSeconds = interval;
+        this.update();
     }
 
 }
