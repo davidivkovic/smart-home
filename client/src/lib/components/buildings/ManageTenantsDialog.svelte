@@ -16,6 +16,7 @@
 
   let dropdownOpen = false
   $: dropdownOpen = query.length > 0
+  $: !dropdownOpen && query.length === 0 && (foundUsers = [])
 
   const setQuery = async (e) => {
     clearTimeout(timer)
@@ -66,13 +67,22 @@
       console.log(err)
     }
   }
+
+  const openDropdown = () => {
+    query && (dropdownOpen = true)
+  }
+
 </script>
 
+{#if dropdownOpen}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div on:click={() => dropdownOpen = false} class="fixed top-0 left-0 z-[2] h-screen w-screen" />
+{/if}
 <form on:submit|preventDefault={saveChanges} class="flex w-[400px] flex-col justify-between">
   <div>
     <h2>Tenants</h2>
     <p class="text-neutral-600">Add or remove tenants from the building</p>
-    <div class="relative mt-6">
+    <div class="relative z-[3] mt-6">
       <div class=" w-full">
         <SearchIcon
           class="absolute left-4 top-0 mt-1.5 translate-y-1/2 text-[13px] text-gray-500"
@@ -86,8 +96,12 @@
           placeholder="Search users.."
           maxlength="50"
           value={query}
-          on:focus={() => (dropdownOpen = true)}
-          on:blur={() => (dropdownOpen = false)}
+          on:focus={openDropdown}
+          on:keydown={(e) => {
+            if (e.key === 'Escape') {
+              dropdownOpen = false
+            }
+          }}
         />
       </div>
       {#if dropdownOpen}
