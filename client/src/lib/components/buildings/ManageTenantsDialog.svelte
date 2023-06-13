@@ -2,7 +2,8 @@
   import { setTenants } from '$lib/api/buildings'
   import { getAll } from '$lib/api/users'
   import SearchIcon from '~icons/tabler/search'
-  import TrashIcon from '~icons/tabler/trash'
+  import XIcon from '~icons/tabler/x'
+  import { user } from '$lib/stores/userStore'
 
   export let buildingId
   export let tenants
@@ -15,18 +16,30 @@
   let dropdownOpen = false
   $: dropdownOpen = query.length > 0
 
-  const setQuery = (e) => {
+  const setQuery = async (e) => {
     clearTimeout(timer)
     const queryString = e.target.value?.trim() ?? ''
     timer = setTimeout(async () => {
       query = queryString
-      query && searchUsers(query)
+      console.log(query)
+      query && (await searchUsers(query))
     }, 300)
   }
 
   const searchUsers = async (query) => {
+    console.log(tenants)
     try {
       foundUsers = await getAll(1, query)
+      console.log(tenants)
+      foundUsers = foundUsers.filter(
+        (u) =>
+          u.id !== $user.id &&
+          tenants.every((u1) => {
+            console.log('IDS:', u1.id, u.id)
+            return u1.id !== u.id
+          })
+      )
+      console.log(foundUsers)
     } catch (err) {
       console.log(err)
     }
@@ -57,7 +70,7 @@
   }
 </script>
 
-<form on:submit|preventDefault={saveChanges} class="flex w-[500px] flex-col justify-between">
+<form on:submit|preventDefault={saveChanges} class="flex w-[400px] flex-col justify-between">
   <div>
     <h2>Tenants</h2>
     <p class="text-neutral-600">Add or remove tenants from the building</p>
@@ -79,17 +92,20 @@
       </div>
       {#if dropdownOpen}
         <div
-          class="absolute top-[45px] h-fit w-full divide-y-[1px] border border-t-0 border-neutral-300 bg-white"
+          class="absolute top-[45px] h-fit w-full divide-y-[1px] border border-t-0 border-neutral-300 bg-white shadow-lg"
         >
           {#if foundUsers.length === 0 && query.length > 0}
-            <!-- <div class="w-full p-3">
-              <p class="text-center">No users found</p>
-            </div> -->
+            <div class="w-full p-3">
+              <p class="text-center text-sm">No users found</p>
+            </div>
           {:else}
             {#each foundUsers as user}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <div class="w-full cursor-pointer p-3" on:click={() => addTenant(user)}>
-                <p>{user.firstName} {user.lastName}</p>
+              <div
+                class="w-full cursor-pointer p-3 transition-colors hover:bg-neutral-50"
+                on:click={() => addTenant(user)}
+              >
+                <p class="font-medium leading-5 text-black">{user.firstName} {user.lastName}</p>
                 <p class="text-sm text-neutral-500">{user.email}</p>
               </div>
             {/each}
@@ -98,25 +114,34 @@
       {/if}
     </div>
 
-    <div class="mt-3 flex h-[400px] flex-col gap-3 overflow-y-auto">
+    <div class="mt-3 flex h-[400px] flex-col overflow-y-auto">
       {#if tenants.length === 0}
         <p class="text-neutral-500">No tenants added</p>
       {/if}
       {#each tenants as tenant}
-        <div class="flex w-full justify-between border border-neutral-300 p-4">
-          <div>
-            <p>{tenant.firstName} {tenant.lastName}</p>
-            <p class="text-sm text-neutral-500">{tenant.email}</p>
+        <div
+          class="flex w-full justify-between border border-t-0 border-neutral-300 p-4 first:border-t"
+        >
+          <div class="flex gap-3">
+            <div
+              class=" flex aspect-square h-full items-center justify-center bg-neutral-200 text-black"
+            >
+              {tenant.firstName[0] + tenant.lastName[0]}
+            </div>
+            <div>
+              <p class="font-medium leading-5 text-black">{tenant.firstName} {tenant.lastName}</p>
+              <p class="text-sm text-neutral-500">{tenant.email}</p>
+            </div>
           </div>
-          <button on:click={() => removeTenant(tenant.id)} class="bg-transparent p-2">
-            <TrashIcon class="text-neutral-500" />
+          <button type="button" on:click={() => removeTenant(tenant.id)} class="bg-transparent p-2">
+            <XIcon class="text-xs text-neutral-500" />
           </button>
         </div>
       {/each}
     </div>
   </div>
 
-  <div class="w-full flex justify-end">
+  <div class="flex w-full justify-end">
     <div class="mt-6 flex gap-2">
       <button type="button" on:click={close} class="secondary !border-transparent"> Cancel </button>
       <button class="primary px-7">Save changes</button>
