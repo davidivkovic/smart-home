@@ -72,25 +72,36 @@
     query && (dropdownOpen = true)
   }
 
+  const clearQuery = () => {
+    query = ''
+  }
+
 </script>
 
 {#if dropdownOpen}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div on:click={() => dropdownOpen = false} class="fixed top-0 left-0 z-[2] h-screen w-screen" />
+  <div on:click={() => (dropdownOpen = false)} class="fixed top-0 left-0 z-[2] h-screen w-screen" />
 {/if}
 <form on:submit|preventDefault={saveChanges} class="flex w-[400px] flex-col justify-between">
   <div>
     <h2>Tenants</h2>
     <p class="text-neutral-600">Add or remove tenants from the building</p>
     <div class="relative z-[3] mt-6">
-      <div class=" w-full">
+      <div class=" relative w-full">
         <SearchIcon
           class="absolute left-4 top-0 mt-1.5 translate-y-1/2 text-[13px] text-gray-500"
         />
+        {#if query}
+          <button type="reset" on:click={clearQuery}
+            class="absolute -right-2 top-0 mt-0.5 text-[13px] bg-transparent text-gray-500"
+          >
+            <XIcon class="" />
+          </button>
+        {/if}
         <input
           on:input={setQuery}
           autocomplete="off"
-          type="search"
+          type="text"
           class=" w-full bg-white pl-11"
           name="query"
           placeholder="Search users.."
