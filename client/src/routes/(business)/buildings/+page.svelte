@@ -1,15 +1,20 @@
 <script>
   import { invalidateAll } from '$app/navigation'
 
-  import { openDialog } from '$lib/stores/appStore'
   import { isLandlord, user } from '$lib/stores/userStore'
+  import { openDialog } from '$lib/stores/appStore'
+  import { getDeviceTypes } from '$lib/api/devices'
   import { deleteBuilding, getBuildingTypes } from '$lib/api/buildings'
   import AddBuildingDialog from '$lib/components/buildings/AddBuildingDialog.svelte'
   import ManageTenantsDialog from '$lib/components/buildings/ManageTenantsDialog.svelte'
+
   import TrashIcon from '~icons/tabler/trash'
+  import AddDeviceDialog from '$lib/components/devices/AddDeviceDialog.svelte'
+  import { building } from '$app/environment'
 
   export let data
   let buildingTypes
+  let deviceTypes
 
   const addBuilding = async () => {
     openDialog(AddBuildingDialog, { buildingTypes }, () => invalidateAll())
@@ -18,6 +23,12 @@
   const preloadTypes = async () => {
     if (!buildingTypes) {
       buildingTypes = await getBuildingTypes()
+    }
+  }
+
+  const preloadDeviceTypes = async () => {
+    if (!deviceTypes) {
+      deviceTypes = await getDeviceTypes()
     }
   }
 
@@ -31,7 +42,13 @@
   }
 
   const manageTenants = async (building) => {
-    openDialog(ManageTenantsDialog, { buildingId: building.id, tenants: building.tenants  }, () => invalidateAll())
+    openDialog(ManageTenantsDialog, { buildingId: building.id, tenants: building.tenants }, () =>
+      invalidateAll()
+    )
+  }
+
+  const addDevice = async () => {
+    openDialog(AddDeviceDialog, { buildingId: building.id, deviceTypes  }, () => invalidateAll())
   }
 </script>
 
@@ -78,6 +95,9 @@
           <TrashIcon class="text-[13px] text-gray-700" />
         </button>
       </div>
+    </div>
+    <div>
+      <button on:mouseenter={preloadDeviceTypes} on:click={addDevice}>Devices</button>
     </div>
   {/each}
 </div>

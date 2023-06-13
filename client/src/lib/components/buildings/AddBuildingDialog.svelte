@@ -23,10 +23,11 @@
   <p class="text-sm">Fill in the data about the building you want to monitor</p>
   <div class="flex gap-3">
     <div class="mt-5 flex flex-col gap-1">
-      <label for="email">Name</label>
+      <label for="name">Name</label>
       <input
         required
         type="search"
+        id="name"
         name="name"
         placeholder="Building name"
         autocomplete="off"
@@ -34,10 +35,11 @@
       />
     </div>
     <div class="mt-5 flex flex-col gap-1">
-      <label for="email">Address</label>
+      <label for="address">Address</label>
       <input
         required
         type="text"
+        id="address"
         name="address"
         placeholder="Building address"
         autocomplete="address-level1"
