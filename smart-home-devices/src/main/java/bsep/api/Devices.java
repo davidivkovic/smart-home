@@ -2,7 +2,9 @@ package bsep.api;
 
 import bsep.api.dto.devices.AddDeviceRequest;
 import bsep.devices.Device;
+
 import io.quarkus.security.Authenticated;
+
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.Response;
 public class Devices extends Resource {
 
     @GET
+    @Authenticated
     @Path("/types")
     public Response getDeviceTypes()
     {
@@ -24,19 +27,20 @@ public class Devices extends Resource {
 
     @POST
     @Path("/")
-//    @Authenticated
+    @Authenticated
     public Response addDevice(@Valid AddDeviceRequest request)
     {
         var deviceType = Device.getTypeById(request.typeId);
         if (deviceType == null) return badRequest("This device type does not exist.");
 
-        var device = new Device(request.name, request.brand, "userid", request.buildingId, deviceType);
+        var device = new Device(request.name, request.brand, userId(), request.buildingId, deviceType);
         device.persist();
 
         return ok(device);
     }
 
     @GET
+    @Authenticated
     @Path("/{id}")
     public Response getDevice(@PathParam("id") String deviceId)
     {
@@ -47,6 +51,7 @@ public class Devices extends Resource {
     }
 
     @DELETE
+    @Authenticated
     @Path("/{id}")
     public Response removeDevice(@PathParam("id") String deviceId)
     {
@@ -54,6 +59,23 @@ public class Devices extends Resource {
         if (device == null) return badRequest("This device does not exist.");
 
         device.delete();
+
+        return ok();
+    }
+
+    @POST
+    @Authenticated
+    @Path("/{id}/config")
+    public Response pushEvent(
+            @PathParam("id") String deviceId,
+            @QueryParam("regex") String regex,
+            @QueryParam("interval") int interval
+    )
+    {
+        Device device = Device.findById(new ObjectId(deviceId));
+        if (device == null) return badRequest("This device does not exist.");
+
+        device.setConfig(regex, interval);
 
         return ok();
     }
@@ -67,19 +89,4 @@ public class Devices extends Resource {
         : forbidden();
     }
 
-    @POST
-    @Path("/{id}/config")
-    public Response pushEvent(
-        @PathParam("id") String deviceId,
-        @QueryParam("regex") String regex,
-        @QueryParam("interval") int interval
-    )
-    {
-        Device device = Device.findById(new ObjectId(deviceId));
-        if (device == null) return badRequest("This device does not exist.");
-
-        device.setConfig(regex, interval);
-
-        return ok();
-    }
 }

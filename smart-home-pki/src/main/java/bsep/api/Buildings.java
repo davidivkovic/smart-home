@@ -3,25 +3,29 @@ package bsep.api;
 import bsep.api.dto.buildings.CreateBuildingRequest;
 import bsep.api.dto.users.UserDTO;
 import bsep.buildings.Building;
+import bsep.devices.DevicesService;
 import bsep.users.User;
+
+import static bsep.util.Utils.mapper;
 
 import io.quarkus.security.Authenticated;
 
 import org.bson.types.ObjectId;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.util.List;
 
-import static bsep.util.Utils.mapper;
 
 @Path("/buildings")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Buildings extends Resource {
+
+    @RestClient DevicesService devices;
 
     @GET
     @Path("/types")
@@ -87,7 +91,6 @@ public class Buildings extends Resource {
     @POST
     @Authenticated
     @Path("/{id}/tenants")
-    @Operation(summary = "Sets and overrides the tenants of a building. This method is idempotent. Can be used to remove tenants from a building.")
     public Response setTenants(@PathParam("id") String id, @QueryParam("tenantIds") List<String> tenantIds)
     {
         Building building = Building.findById(new ObjectId(id));
@@ -102,6 +105,24 @@ public class Buildings extends Resource {
         building.update();
 
         return ok();
+    }
+
+    @GET
+    @Authenticated
+    @Path("/{id}/devices")
+    public Response getDevices(@PathParam("id") String id)
+    {
+        Building building = Building.findById(new ObjectId(id));
+        if (building == null) return badRequest("Building with this id does not exist");
+
+        if (!isAdmin() && !building.visibleTo(userId())) return forbidden();
+
+        try {
+            return ok(this.devices.getAll(building.id.toString(), "X9Nf2NqBKw3xtDNh"));
+        }
+        catch (Exception e) {
+            return badRequest("Could not get the list of devices. Please try again later.");
+        }
     }
 
 }

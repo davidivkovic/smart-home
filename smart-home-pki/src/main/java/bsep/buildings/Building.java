@@ -56,4 +56,8 @@ public class Building extends PanacheMongoEntity {
         new BuildingType(BuildingCategory.GARAGE, "Garage")
     );
 
+    public boolean visibleTo(String userId) {
+        return this.landlordId.equals(userId) || this.tenants.stream().anyMatch(tenant -> tenant.id.equals(userId));
+    }
+
 }

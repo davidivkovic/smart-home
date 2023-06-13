@@ -8,6 +8,13 @@ repositories {
     mavenLocal()
 }
 
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.google.inject:guice') using module('com.google.inject:guice:5.0.1') withoutClassifier()
+    }
+}
+
+
 dependencies {
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-container-image-docker'
@@ -24,7 +31,15 @@ dependencies {
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-elytron-security-common'
     implementation 'io.quarkus:quarkus-resteasy'
+    implementation 'io.quarkus:quarkus-rest-client-jackson'
     implementation 'io.quarkiverse.mfa:quarkus-mfa:0.5.7'
+    implementation 'io.quarkus:quarkus-scheduler'
+    implementation 'org.drools:drools-core:8.38.0.Final'
+    implementation 'org.drools:drools-compiler:8.38.0.Final'
+    implementation 'org.drools:drools-xml-support:8.38.0.Final'
+    implementation 'org.drools:drools-templates:8.38.0.Final'
+    implementation 'org.kie:kie-ci:8.38.0.Final'
+    implementation 'org.kie:kie-api:8.38.0.Final'
     implementation 'org.bouncycastle:bcprov-jdk18on:1.72'
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
     implementation 'org.modelmapper:modelmapper:3.1.1'
