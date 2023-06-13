@@ -66,4 +66,20 @@ public class Devices extends Resource {
         ? ok(Device.list("buildingId", buildingId))
         : forbidden();
     }
+
+    @POST
+    @Path("/{id}/config")
+    public Response pushEvent(
+        @PathParam("id") String deviceId,
+        @QueryParam("regex") String regex,
+        @QueryParam("interval") int interval
+    )
+    {
+        Device device = Device.findById(new ObjectId(deviceId));
+        if (device == null) return badRequest("This device does not exist.");
+
+        device.setConfig(regex, interval);
+
+        return ok();
+    }
 }
