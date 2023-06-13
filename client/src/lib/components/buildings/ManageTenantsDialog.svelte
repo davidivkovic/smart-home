@@ -22,7 +22,7 @@
     const queryString = e.target.value?.trim() ?? ''
     timer = setTimeout(async () => {
       query = queryString
-      if(query.length === 0) return (foundUsers = [])
+      if (query.length === 0) return (foundUsers = [])
       loading = true
       query && (await searchUsers(query))
       loading = false
@@ -86,6 +86,8 @@
           placeholder="Search users.."
           maxlength="50"
           value={query}
+          on:focus={() => (dropdownOpen = true)}
+          on:blur={() => (dropdownOpen = false)}
         />
       </div>
       {#if dropdownOpen}
