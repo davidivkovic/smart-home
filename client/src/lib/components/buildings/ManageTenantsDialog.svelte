@@ -82,7 +82,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div on:click={() => (dropdownOpen = false)} class="fixed top-0 left-0 z-[2] h-screen w-screen" />
 {/if}
-<form on:submit|preventDefault={saveChanges} class="flex w-[400px] flex-col justify-between">
+<form on:submit|preventDefault={saveChanges} class="flex w-full min-w-[400px] flex-col justify-between">
   <div>
     <h2>Tenants</h2>
     <p class="text-neutral-600">Add or remove tenants from the building</p>
