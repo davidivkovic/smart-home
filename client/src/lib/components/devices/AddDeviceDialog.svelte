@@ -1,15 +1,24 @@
 <script>
+  import { addDevice } from "$lib/api/devices"
+
   export let close
   export let deviceTypes
   export let buildingId
 
   const brands = ['Huawei', 'Xiaomi', 'Samsung']
 
-  const saveDevice = (event) => {
+  const saveDevice = async (event) => {
     event.preventDefault()
     const data = Object.fromEntries(new FormData(event.target))
-    console.log(data, buildingId)
+    const { name, brand, device } = data
+    try {
+      await addDevice(name.trim(), brand, device, buildingId)
+      close()
+    } catch (err) {
+      console.log(err)
+    } 
   }
+
 </script>
 
 <form on:submit|preventDefault={saveDevice} class="relative max-h-[90vh] w-[500px] bg-white">
@@ -24,12 +33,12 @@
             <label for="name">Name</label>
             <input
               required
-              type="search"
+              type="text"
               id="name"
               name="name"
               placeholder="Device name"
               autocomplete="off"
-              maxlength="100"
+              maxlength="30"
             />
           </div>
           <div class="flex flex-1 flex-col gap-1">

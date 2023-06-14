@@ -9,27 +9,14 @@
   import ManageTenantsDialog from '$lib/components/buildings/ManageTenantsDialog.svelte'
 
   import TrashIcon from '~icons/tabler/trash'
+  import PlusIcon from '~icons/tabler/plus'
   import AddDeviceDialog from '$lib/components/devices/AddDeviceDialog.svelte'
-  import { building } from '$app/environment'
 
   export let data
-  let buildingTypes
-  let deviceTypes
 
   const addBuilding = async () => {
+    const buildingTypes = await getBuildingTypes()
     openDialog(AddBuildingDialog, { buildingTypes }, () => invalidateAll())
-  }
-
-  const preloadTypes = async () => {
-    if (!buildingTypes) {
-      buildingTypes = await getBuildingTypes()
-    }
-  }
-
-  const preloadDeviceTypes = async () => {
-    if (!deviceTypes) {
-      deviceTypes = await getDeviceTypes()
-    }
   }
 
   const remove = async (id) => {
@@ -47,8 +34,9 @@
     )
   }
 
-  const addDevice = async () => {
-    openDialog(AddDeviceDialog, { buildingId: building.id, deviceTypes  }, () => invalidateAll())
+  const addDevice = async (building) => {
+    const deviceTypes = await getDeviceTypes()
+    openDialog(AddDeviceDialog, { buildingId: building.id, deviceTypes }, () => invalidateAll())
   }
 </script>
 
@@ -59,7 +47,6 @@
   </div>
   {#if $isLandlord}
     <button
-      on:mouseenter={preloadTypes}
       on:click={addBuilding}
       class="secondary ml-auto mt-1 h-11 !border-neutral-300 py-1 px-10 !text-sm"
       >Add a building</button
@@ -73,31 +60,57 @@
 
 <div class="mt-6 flex flex-col gap-4">
   {#each data.buildings as building}
-    <div class="flex w-full items-center justify-between border border-neutral-300 bg-white p-5">
-      <div class="flex items-center gap-4">
-        <img src={building.type.image} class="h-16 w-16" alt="Building type" />
-        <div>
-          <p class="font-medium text-black">{building.name}</p>
-          <p class="text-sm text-neutral-600">{building.type.categoryName} at {building.address}</p>
+    <div class="border border-neutral-300 bg-white">
+      <div class=" flex w-full items-center justify-between border-b border-neutral-300 p-5">
+        <div class="flex items-center gap-4">
+          <img src={building.type.image} class="h-16 w-16" alt="Building type" />
+          <div>
+            <p class="font-medium text-black">{building.name}</p>
+            <p class="text-sm text-neutral-600">
+              {building.type.categoryName} at {building.address}
+            </p>
+          </div>
+        </div>
+        <div class="flex">
+          <button
+            class="h-10 cursor-pointer border border-neutral-300 bg-neutral-100 px-6 py-0 text-[13px]"
+            on:click={() => manageTenants(building)}
+          >
+            Tenants
+          </button>
+          <button
+            class="h-10 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 px-6 py-0 text-[13px]"
+            on:click={() => remove(building.id)}
+          >
+            <TrashIcon class="text-[13px] text-gray-700" />
+          </button>
         </div>
       </div>
-      <div class="flex">
-        <button
-          class="h-10 cursor-pointer border border-neutral-300 bg-neutral-100 px-6 py-0 text-[13px]"
-          on:click={() => manageTenants(building)}
-        >
-          Tenants
-        </button>
-        <button
-          class="h-10 cursor-pointer border border-l-0 border-neutral-300 bg-neutral-100 px-6 py-0 text-[13px]"
-          on:click={() => remove(building.id)}
-        >
-          <TrashIcon class="text-[13px] text-gray-700" />
-        </button>
+      <div class="ml-2 p-5">
+        {#if building.devices?.length === 0}
+          <p class="text-sm">No devices yet</p>
+        {:else}
+          <p class="text-sm font-semibold text-black">Devices</p>
+        {/if}
+
+        <div class="mt-4 grid grid-flow-row auto-rows-max grid-cols-6 gap-3">
+          <button
+            on:click={() => addDevice(building)}
+            class="flex h-36 items-center justify-center bg-neutral-100"
+          >
+            <PlusIcon />
+          </button>
+          {#each building.devices as device}
+            <div
+              class="flex h-36 cursor-pointer flex-col items-center justify-center bg-neutral-50 p-4 text-center transition-colors hover:bg-neutral-100"
+            >
+              <img src={device.type.image} class="h-12 w-12" alt="Device type" />
+              <p class="mt-2 text-sm font-medium text-black">{device.name}</p>
+              <span class="text-xs">{device.brand}</span>
+            </div>
+          {/each}
+        </div>
       </div>
-    </div>
-    <div>
-      <button on:mouseenter={preloadDeviceTypes} on:click={addDevice}>Devices</button>
     </div>
   {/each}
 </div>
