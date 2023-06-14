@@ -1,12 +1,13 @@
 <script>
   import Container from './Container.svelte'
   import userStore, { user, isAdmin } from '$lib/stores/userStore'
+  import { headerHeight } from '$lib/stores/appStore'
   import { page } from '$app/stores'
 </script>
 
-<div class="sticky h-16 w-full justify-center">
+<div class="w-full flex flex-col items-center justify-center" bind:clientHeight={$headerHeight}>
   <Container>
-    <div class="flex">
+    <div class="flex pt-8">
       <a
         href="/certificates"
         class="text-sm font-medium underline-offset-2"

@@ -9,18 +9,19 @@ import bsep.util.SecurityUtils;
 
 import static bsep.util.Utils.mapper;
 
+import io.quarkus.logging.Log;
 import io.quarkus.security.Authenticated;
 
 import org.bson.types.ObjectId;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 
 @Path("auth")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,6 +36,8 @@ public class Authentication extends Resource {
             @Valid @NotNull AuthenticationRequest request,
             @HeaderParam("User-Agent") String userAgent
     ) {
+        Log.info("User-Agent: " + "david");
+
         var user = User.findByEmail(request.email);
 
         var success = User.authenticate(user, request.password);

@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store'
+import { writable, get, derived } from 'svelte/store'
 
 export const dialogs = writable([])
 export const notifications = writable([])
@@ -41,3 +41,11 @@ export const openNotification = (text, title = '') => {
 export const closeNotification = (id) => {
   notifications.update((n) => n.filter((notification) => notification.id !== id))
 }
+
+export const headerHeight = writable(0)
+export const notificationsHeight = writable(0)
+
+export const shellHeight = derived([headerHeight, notificationsHeight], ([h1, h2]) => {
+    return h1 + h2 + 48
+  }
+)
