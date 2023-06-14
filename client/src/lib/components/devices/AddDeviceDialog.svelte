@@ -14,7 +14,7 @@
 
 <form on:submit|preventDefault={saveDevice} class="relative max-h-[90vh] w-[500px] bg-white">
   <div class="relative h-fit">
-    <div class="sticky -top-6 py-4 -mt-6 bg-white">
+    <div class="sticky -top-[24px] py-5 -mt-[24px] bg-white">
       <h1 class="text-xl">Add a device</h1>
       <p class="text-sm">Fill in the data about the device you want to monitor</p>
 
