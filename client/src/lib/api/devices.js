@@ -7,4 +7,13 @@ const getDeviceTypes = async () => {
   return await response.json()
 }
 
-export { getDeviceTypes }
+const addDevice = async (name, brand, typeId, buildingId) => { 
+  const response = await fetch(devicesUrl, {
+    method: 'POST',
+    body: JSON.stringify({ name, brand, typeId, buildingId })
+  })
+  return await response.json()
+}
+
+
+export { getDeviceTypes, addDevice }

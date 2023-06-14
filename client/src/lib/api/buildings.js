@@ -36,4 +36,9 @@ const setTenants = async (id, tenantIds) => {
   )
 }
 
-export { getBuildingTypes, getBuildings, addBuilding, deleteBuilding, setTenants }
+const getDevices = async (id) => {
+  const response = await fetch(buildingsUrl + `/${id}/devices`)
+  return await response.json()
+}
+
+export { getBuildingTypes, getBuildings, addBuilding, deleteBuilding, setTenants, getDevices }
