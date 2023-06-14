@@ -1,3 +1,3 @@
-<div class="flex-1 mx-auto w-full p-2 xl:w-[900px] xl:px-0 py-10">
+<div class="mx-auto w-full p-2 lg:w-[900px] xl:px-0 pb-8">
   <slot />
 </div>

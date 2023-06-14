@@ -19,6 +19,7 @@ dependencies {
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-container-image-docker'
     implementation 'io.quarkus:quarkus-mongodb-panache'
+    implementation 'io.quarkus:quarkus-mongodb-client'
     implementation 'io.quarkus:quarkus-resteasy-multipart'
     implementation 'io.quarkus:quarkus-smallrye-jwt'
     implementation 'io.quarkus:quarkus-hibernate-validator'
@@ -32,8 +33,9 @@ dependencies {
     implementation 'io.quarkus:quarkus-elytron-security-common'
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-rest-client-jackson'
-    implementation 'io.quarkiverse.mfa:quarkus-mfa:0.5.7'
     implementation 'io.quarkus:quarkus-scheduler'
+    implementation 'io.quarkus:quarkus-logging-json'
+    implementation 'io.quarkiverse.mfa:quarkus-mfa:0.5.8'
     implementation 'org.drools:drools-core:8.38.0.Final'
     implementation 'org.drools:drools-compiler:8.38.0.Final'
     implementation 'org.drools:drools-xml-support:8.38.0.Final'
