@@ -11,14 +11,16 @@
   onMount(() => {
     dialog.showModal()
   })
-
 </script>
 
-<dialog bind:this={dialog} class="min-w-[300px] p-6 backdrop:bg-black/40 relative">
+<dialog
+  bind:this={dialog}
+  class="relative min-w-[300px] overflow-x-hidden p-6 backdrop:bg-black/40"
+>
   {#if hasCloseButton}
-    <button class="absolute top-5 right-0 bg-transparent" on:click={close}>
-      <XIcon/>
+    <button class="sticky !top-4 right-0 z-10 float-right bg-transparent" on:click={close}>
+      <XIcon />
     </button>
   {/if}
-  <slot/>
+  <slot />
 </dialog>
