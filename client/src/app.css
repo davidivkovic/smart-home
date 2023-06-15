@@ -5,8 +5,13 @@
 @layer base {
   html {
     @apply bg-neutral-100;
-    /* overflow-y: overlay; */
+    scrollbar-gutter: stable;
   }
+
+  html:has(dialog[open]:modal) {
+    @apply overflow-hidden;
+  }
+
   h1 {
     @apply text-3xl font-bold;
   }
@@ -56,11 +61,11 @@
   }
 
   [type='checkbox'] {
-    @apply h-4 w-4 text-black border-gray-300 focus:ring-transparent bg-neutral-100;
+    @apply h-4 w-4 border-gray-300 bg-neutral-100 text-black focus:ring-transparent;
   }
 
   [type='radio'] {
-    @apply h-4 w-4 text-black border-gray-300 focus:ring-transparent bg-neutral-100;
+    @apply h-4 w-4 border-gray-300 bg-neutral-100 text-black focus:ring-transparent;
   }
 
   label {

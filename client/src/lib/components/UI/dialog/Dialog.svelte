@@ -15,7 +15,7 @@
 
 <dialog
   bind:this={dialog}
-  class="relative min-w-[300px] overflow-x-hidden p-6 backdrop:bg-black/40"
+  class="min-w-[300px] overflow-x-hidden p-6 backdrop:bg-black/40 "
 >
   {#if hasCloseButton}
     <button class="sticky !-top-2 !-mt-10 !-mr-5 -right-5 z-10 float-right bg-transparent" on:click={close}>
