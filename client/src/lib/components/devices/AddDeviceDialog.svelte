@@ -23,7 +23,7 @@
 
 <form on:submit|preventDefault={saveDevice} class="relative max-h-[90vh] w-[500px] bg-white">
   <div class="relative h-fit">
-    <div class="sticky -top-[24px] py-5 -mt-[24px] bg-white">
+    <div class="sticky -top-[24px] pt-5 pb-3 -mt-[24px] bg-white">
       <h1 class="text-xl">Add a device</h1>
       <p class="text-sm">Fill in the data about the device you want to monitor</p>
 
@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="mt-5">
-        <label class="  text-black" for="category">Device category</label>
+        <label class="text-[15px] text-black" for="category">Device category</label>
         <p class="text-sm">
           Pick a category that suits your device the best
         </p>
@@ -61,7 +61,7 @@
 
 
     {#each deviceTypes as category}
-      <div class="mt-4  h-fit">
+      <div class="mb-4 h-fit">
         <h2 class="text-sm font-medium">{category[0].categoryName}</h2>
         <div class="mt-2 grid grid-cols-2 gap-2">
           {#each category as type}

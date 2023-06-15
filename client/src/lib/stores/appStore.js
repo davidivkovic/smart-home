@@ -46,6 +46,5 @@ export const headerHeight = writable(0)
 export const notificationsHeight = writable(0)
 
 export const shellHeight = derived([headerHeight, notificationsHeight], ([h1, h2]) => {
-    return h1 + h2 + 48
-  }
-)
+  return h1 + h2 + 48
+})

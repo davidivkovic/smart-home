@@ -61,7 +61,7 @@
 <div class="mt-6 flex flex-col gap-4">
   {#each data.buildings as building}
     <div class="border border-neutral-300 bg-white">
-      <div class=" flex w-full items-center justify-between border-b border-neutral-300 p-5">
+      <div class=" flex w-full items-center justify-between border-neutral-300 p-5">
         <div class="flex items-center gap-4">
           <img src={building.type.image} class="h-16 w-16" alt="Building type" />
           <div>
@@ -86,29 +86,35 @@
           </button>
         </div>
       </div>
-      <div class="ml-2 p-5">
-        {#if building.devices?.length === 0}
-          <p class="text-sm">No devices yet</p>
-        {:else}
-          <p class="text-sm font-semibold text-black">Devices</p>
-        {/if}
-
-        <div class="mt-4 grid grid-flow-row auto-rows-max grid-cols-6 gap-3">
-          <button
-            on:click={() => addDevice(building)}
-            class="flex h-36 items-center justify-center bg-neutral-100"
-          >
-            <PlusIcon />
-          </button>
+      <div class="-mt-2 px-5 pb-5">
+        <div class="mt-4 grid grid-flow-row auto-rows-max grid-cols-5 gap-3">
           {#each building.devices as device}
             <div
-              class="flex h-36 cursor-pointer flex-col items-center justify-center bg-neutral-50 p-4 text-center transition-colors hover:bg-neutral-100"
+              class="flex h-36 cursor-pointer flex-col items-center justify-center border bg-neutral-100 p-4 text-center transition-colors hover:bg-neutral-200"
             >
+              <span class="text-xs text-neutral-600">{device.brand}</span>
               <img src={device.type.image} class="h-12 w-12" alt="Device type" />
               <p class="mt-2 text-sm font-medium text-black">{device.name}</p>
-              <span class="text-xs">{device.brand}</span>
+              <span class="w-full truncate text-xs text-neutral-600">{device.type.name}</span>
             </div>
           {/each}
+          <button
+            on:click={() => addDevice(building)}
+            class="flex h-36 flex-col items-center justify-center gap-2 border bg-neutral-100 hover:bg-neutral-200"
+          >
+            <!-- <PlusIcon class="w-8 h-8 text-neutral-600 stroke-1" /> -->
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-7 w-7 text-neutral-600"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+
+            <span class="text-[13px] text-neutral-600">Add device</span>
+          </button>
         </div>
       </div>
     </div>
