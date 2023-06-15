@@ -3,7 +3,7 @@
   import Header from '$lib/components/common/Header.svelte'
 </script>
 
-<div class="flex  w-full flex-col">
+<div class="flex flex-1 w-full flex-col">
   <Header />
   <Container>
     <slot />
