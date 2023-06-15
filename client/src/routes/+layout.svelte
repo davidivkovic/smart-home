@@ -5,8 +5,10 @@
   import NotificationOutlet from '$lib/components/UI/notification/NotificationOutlet.svelte'
 </script>
 
-<NotificationOutlet/>
-<main class="flex flex-col items-center justify-center">
-  <slot />
-</main>
-<DialogOutlet/>
+<div class="min-h-screen flex flex-col">
+  <NotificationOutlet/>
+  <main class="flex flex-1 flex-col items-center justify-center">
+    <slot />
+  </main>
+  <DialogOutlet/>
+</div>
