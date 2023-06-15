@@ -10,8 +10,8 @@ const getAll = async (before, after, level, regex) => {
 
   const params = new URLSearchParams()
 
-  before && params.append('before', dayjs(before).toISOString().replace('Z', ''))
-  after && params.append('after', dayjs(after).toISOString().replace('Z', ''))
+  before && params.append('before', dayjs(before).add(2, 'h').toISOString().replace('Z', ''))
+  after && params.append('after', dayjs(after).add(2, 'h').toISOString().replace('Z', ''))
   regex && params.append('regex', regex)
   level && level != 'ALL' && params.append('level', level)
 

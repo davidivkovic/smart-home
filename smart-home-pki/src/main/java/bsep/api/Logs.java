@@ -6,6 +6,7 @@ import bsep.users.User;
 import static bsep.util.Utils.coalesce;
 
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Sort;
 import io.quarkus.security.Authenticated;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -34,7 +35,7 @@ public class Logs extends Resource {
         if (before == null && after == null) return badRequest("Please provide a before or after date.");
         if (regex == null || regex.isEmpty()) regex = ".*";
 
-        var query = after != null ? "timestamp > ?1" : "timestamp <= ?1";
+        var query = after != null ? "timestamp > ?1" : "timestamp < ?1";
         if (level != null && !level.isEmpty()) query += " and level = ?3";
 
         var value = coalesce(after, before);
@@ -44,7 +45,10 @@ public class Logs extends Resource {
         catch (Exception e) { return badRequest("Specified date format is not valid."); }
 
         var logs = Log
-                .find(query + " and message like ?2 order by timestamp desc", date, "/" + regex + "/i", level)
+                .find(query + " and message like ?2",
+                        Sort.by("timestamp", Sort.Direction.Descending),
+                        date, regex, level
+                )
                 .page(Page.ofSize(20))
                 .list();
 

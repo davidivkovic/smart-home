@@ -38,6 +38,15 @@
       >
         Buildings
       </a>
+      {#if $isAdmin}
+      <a
+        href="/logs"
+        class="ml-4 text-sm font-medium underline-offset-2"
+        class:underline={$page.url.pathname === '/logs'}
+      >
+        Logs
+      </a>
+      {/if}
       <a
         href="/profile"
         class="ml-auto mr-1.5 text-sm"
