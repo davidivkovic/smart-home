@@ -1,0 +1,8 @@
+package rules;
+
+rule "String test rule"
+    when
+        $s: String()
+    then
+        System.out.println("String: " + $s);
+end
