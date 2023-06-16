@@ -29,6 +29,11 @@
     scrollPanel.scrollTo({ top: scrollPanel.scrollHeight, behavior: 'smooth' })
   }
 
+  const reset = () => {
+    dispatch('reset')
+    scrollToBottom()
+  }
+
 </script>
 
 <div 
@@ -49,12 +54,12 @@
         >
           { log.level }
         </code> 
-        - { log.message }
+        - { log.service } - { log.message }
       </code>
     </div>
   {/each}
 </div>
-<button on:click={scrollToBottom} class="absolute flex items-center -bottom-3 right-6 !border-neutral-300 secondary px-3 py-2">
+<button on:click={reset} class="absolute flex items-center -bottom-3 right-6 !border-neutral-300 secondary px-3 py-2">
   <span class="text-[13px] mr-1">Show Newest</span>
   <ArrowDownIcon class="w-4 h-4" />
 </button>

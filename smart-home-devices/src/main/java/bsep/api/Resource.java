@@ -2,8 +2,8 @@ package bsep.api;
 
 import io.quarkus.hibernate.validator.runtime.jaxrs.ResteasyViolationExceptionImpl;
 
-import javax.validation.ConstraintViolation;
-import javax.ws.rs.core.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.ws.rs.core.*;
 
 import java.util.List;
 import java.util.Set;

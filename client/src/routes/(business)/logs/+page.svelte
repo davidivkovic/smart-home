@@ -43,7 +43,7 @@
         !exhausted
       ) {
         isFetching = true
-        const olderLogs = await getAll(logs.at(-1).timestamp, null, logLevel, regex)
+        const olderLogs = await getAll(logs.at(-1)?.timestamp, null, logLevel, regex)
         exhausted = olderLogs.length == 0
 
         if (!exhausted) {
@@ -55,7 +55,7 @@
     }
 
     const interval = setInterval(async () => {
-      const newerLogs = await getAll(null, logs.at(0).timestamp, logLevel, regex)
+      const newerLogs = await getAll(null, logs.at(0)?.timestamp, logLevel, regex)
       if (newerLogs.length) {
         logs = [...newerLogs, ...logs]
       }
@@ -104,5 +104,11 @@
       />
     </div>
   </div>
-  <Log logs={logs} bind:this={logInstance} class="mt-4 flex-1 -mb-6" on:scroll={e => onScroll(e.detail)} />
+  <Log 
+    bind:this={logInstance} 
+    on:scroll={e => onScroll(e.detail)} 
+    on:reset={() => exhausted = false}
+    logs={logs}
+    class="mt-4 flex-1 -mb-6"
+  />
 </div>
