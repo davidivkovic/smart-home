@@ -2,10 +2,10 @@ package bsep.util;
 
 import io.quarkus.security.UnauthorizedException;
 
-import javax.annotation.Priority;
-import javax.enterprise.inject.Alternative;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 @Alternative
 @Priority(1)

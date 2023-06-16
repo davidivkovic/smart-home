@@ -8,10 +8,10 @@ import io.quarkus.security.Authenticated;
 
 import org.bson.types.ObjectId;
 
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("/devices")
 @Produces(MediaType.APPLICATION_JSON)
