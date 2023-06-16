@@ -40,6 +40,7 @@ dependencies {
     implementation 'org.drools:drools-compiler:8.38.0.Final'
     implementation 'org.drools:drools-xml-support:8.38.0.Final'
     implementation 'org.drools:drools-templates:8.38.0.Final'
+    implementation 'org.drools:drools-verifier:8.38.0.Final'
     implementation 'org.kie:kie-ci:8.38.0.Final'
     implementation 'org.kie:kie-api:8.38.0.Final'
     implementation 'org.bouncycastle:bcprov-jdk18on:1.72'

@@ -1,6 +1,6 @@
 package bsep;
 
-import bsep.logging.LogSink;
+import bsep.alarming.Alarm;
 import bsep.util.SecurityUtils;
 import bsep.certificates.CertificateService;
 
@@ -21,6 +21,7 @@ public class OnStartup {
         Security.addProvider(new BouncyCastleProvider());
         CertificateService.init();
         SecurityUtils.init();
+        Alarm.initPresetAlarms();
     }
 
 }
