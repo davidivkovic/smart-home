@@ -31,7 +31,7 @@ docker compose up -d
 ```
 ./smart-home-pki/gradlew quarkusDev
 ```
-3 Run the devices service
+3. Run the devices service
 ```
 ./smart-home-devices/gradlew quarkusDev
 ```
