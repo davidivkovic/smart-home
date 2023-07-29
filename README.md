@@ -1,4 +1,4 @@
-<h1><img src="https://github.com/davidivkovic/smart-home/assets/16724395/914ba50e-a64d-4338-894a-437c842d3b6d" align="center" width="54" height="44"/> Smart Home </h1> 
+<h1><img src="https://github.com/davidivkovic/smart-home/assets/16724395/914ba50e-a64d-4338-894a-437c842d3b6d" align="center" width="60" height="54"/> Smart Home </h1> 
 
 A single place for all the smart and connected devices in your home. Serves as a Public Key Infrastructure and HomeKit clone.
 
