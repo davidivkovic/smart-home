@@ -13,7 +13,7 @@ A single place for all the smart and connected devices in your home. Serves as a
 ## Showcase 📷
 Please make sure to turn on the sound 🔊
 
-https://github.com/davidivkovic/smart-home/assets/16724395/82661b29-679b-43ed-a60e-903f6a1508b7
+https://github.com/davidivkovic/smart-home/assets/16724395/3bedf8c7-3c24-45ab-8762-f42570208429
 
 ## Legal 💼
 I am not affiliated, associated, authorized, endorsed by, or in any way officially connected to smarthome.com, apple.com or HomeKit.
