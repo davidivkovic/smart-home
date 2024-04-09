@@ -1,0 +1,16 @@
+[req]
+prompt = no
+utf8 = yes
+copy_extensions = copy
+distinguished_name = root_ca_distinguished_name
+req_extensions = root_ca_extensions
+
+[ root_ca_distinguished_name ]
+CN = SmartHome Root CA
+OU = Digital Signature Trust Unit
+O = SmartHome
+
+[ root_ca_extensions ]
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=critical,CA:TRUE
+keyUsage=critical,keyCertSign, cRLSign

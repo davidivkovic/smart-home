@@ -1,0 +1,18 @@
+[req]
+prompt = no
+utf8 = yes
+distinguished_name = intermediate_ca_distinguished_name
+
+[ intermediate_ca_distinguished_name ]
+CN = SmartHome European Authority
+OU = European Digital Signature Trust Unit
+O = SmartHome
+L = Europe
+
+[ intermediate_ca_extensions ]
+authorityKeyIdentifier=keyid,issuer
+subjectKeyIdentifier=hash
+basicConstraints=critical,CA:TRUE
+keyUsage=critical, digitalSignature, keyCertSign
+extendedKeyUsage=serverAuth, clientAuth
+crlDistributionPoints=URI:http://localhost:8080/crls/latest.crl
